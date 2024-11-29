@@ -1,0 +1,24 @@
+import 'package:draggable_widget/draggable_widget.dart';
+import 'package:flutter/material.dart';
+
+class FlutoProvider extends ChangeNotifier {
+  final BuildContext globalContext;
+  PluginSheetState _sheetState = PluginSheetState.closed;
+
+  FlutoProvider(this.globalContext);
+  PluginSheetState get sheetState => _sheetState;
+
+  bool get showDraggingButton => _sheetState == PluginSheetState.closed;
+  bool get showButtonSheet => _sheetState == PluginSheetState.clicked;
+
+  setSheetState(PluginSheetState value) {
+    _sheetState = value;
+    if (_sheetState != PluginSheetState.clickedAndOpened) {
+      notifyListeners();
+    }
+  }
+
+  final DragController dragController = DragController();
+}
+
+enum PluginSheetState { clicked, clickedAndOpened, closed }

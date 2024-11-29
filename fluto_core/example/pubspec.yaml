@@ -1,0 +1,39 @@
+name: example
+description: "A new Flutter project."
+
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.2
+
+  shared_preferences: ^2.0.17
+  flutter_secure_storage: ^4.0.0
+
+  http: ^0.13.5
+  dio: ^4.0.6
+  chopper: ^5.1.0
+
+  alice:
+
+  download: ^1.0.0
+  permission_handler: ^11.3.1
+  file_saver:
+  fluto_core:
+    path: ../../fluto_core
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
