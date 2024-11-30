@@ -1,4 +1,5 @@
-import 'dart:developer';
+import 'dart:async';
+import 'dart:developer' as developer;
 import 'package:fluto_core/core/fluto_storage.dart';
 import 'package:fluto_core/core/pluggable.dart';
 import 'package:fluto_core/core/plugin_callback_register.dart';
@@ -21,10 +22,10 @@ class Fluto extends StatefulWidget {
 
   final Widget child;
   final List<TransitionBuilder> wrappedWidgetList;
-
   final FlutoStorage storage;
   final BuildContext globalContext;
   final List<Pluggable> pluginList;
+
   @override
   State<Fluto> createState() => _FlutoState();
 }
@@ -36,6 +37,7 @@ class _FlutoState extends State<Fluto> {
   void initState() {
     super.initState();
     _loadSavedData();
+    _runZoned();
   }
 
   Future<void> _loadSavedData() async {
@@ -72,6 +74,42 @@ class _FlutoState extends State<Fluto> {
         },
       );
       plugin.setup(pluginRegister: pluginRegister);
+    }
+  }
+
+  void _runZoned() {
+    runZoned(
+      () {},
+      zoneSpecification: ZoneSpecification(
+        print: (Zone self, ZoneDelegate parent, Zone zone, String line) {
+          print("Custom print called with: $line");
+          parent.print(
+              zone, "Intercepted: $line"); // Ensure this line is called
+        },
+        handleUncaughtError: (self, parent, zone, error, stackTrace) {
+          parent.print(zone, "Intercepted error: $error");
+        },
+      ),
+      zoneValues: {
+        #log: (String message, {Object? error, StackTrace? stackTrace}) {
+          developer.log("Intercepted: $message",
+              error: error, stackTrace: stackTrace);
+          // Save to a file or do whatever you want
+        }
+      },
+    );
+  }
+
+  void log(String message, {Object? error, StackTrace? stackTrace}) {
+    final logFunction = Zone.current[#log] as void Function(
+      String, {
+      Object? error,
+      StackTrace? stackTrace,
+    })?;
+    if (logFunction != null) {
+      logFunction(message, error: error, stackTrace: stackTrace);
+    } else {
+      developer.log(message, error: error, stackTrace: stackTrace);
     }
   }
 
