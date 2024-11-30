@@ -54,8 +54,10 @@ Future<void> showFlutoBottomSheet(BuildContext context) async {
                           child: FlutoSheetListTile(plugin: plugin),
                         );
                       },
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                      ),
                     ),
                   ),
                 ),
