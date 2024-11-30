@@ -17,14 +17,14 @@ class Fluto extends StatefulWidget {
     this.wrappedWidgetList = const [],
     this.storage = const NoFlutoStorage(),
     this.pluginList = const [],
-    required this.globalContext,
+    required this.globalNavigatorKey,
   });
 
   final Widget child;
   final List<TransitionBuilder> wrappedWidgetList;
   final FlutoStorage storage;
-  final BuildContext globalContext;
   final List<Pluggable> pluginList;
+  final GlobalKey<NavigatorState> globalNavigatorKey;
 
   @override
   State<Fluto> createState() => _FlutoState();
@@ -36,8 +36,10 @@ class _FlutoState extends State<Fluto> {
   @override
   void initState() {
     super.initState();
-    _loadSavedData();
-    _runZoned();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadSavedData();
+      _runZoned();
+    });
   }
 
   Future<void> _loadSavedData() async {
@@ -47,12 +49,17 @@ class _FlutoState extends State<Fluto> {
       }
     });
 
-    final pluginList = widget.pluginList;
+    List<Pluggable> pluginList = [
+      ...FlutoPluginRegistrar.defaultPlugins.values,
+      ...widget.pluginList
+    ];
+
     FlutoPluginRegistrar.registerAllPlugins(pluginList);
     for (final plugin in pluginList) {
       analysePlugin(plugin);
       final pluginRegister = PluginRegister(
-        globalContext: widget.globalContext,
+        globalContext:
+            widget.globalNavigatorKey.currentContext!, // Use the global context
         savePluginData: (final value) async {
           if (_savedData == null) {
             _savedData = FlutoStorageModel(
@@ -82,9 +89,7 @@ class _FlutoState extends State<Fluto> {
       () {},
       zoneSpecification: ZoneSpecification(
         print: (Zone self, ZoneDelegate parent, Zone zone, String line) {
-          print("Custom print called with: $line");
-          parent.print(
-              zone, "Intercepted: $line"); // Ensure this line is called
+          parent.print(zone, "Intercepted: $line");
         },
         handleUncaughtError: (self, parent, zone, error, stackTrace) {
           parent.print(zone, "Intercepted error: $error");
@@ -94,7 +99,6 @@ class _FlutoState extends State<Fluto> {
         #log: (String message, {Object? error, StackTrace? stackTrace}) {
           developer.log("Intercepted: $message",
               error: error, stackTrace: stackTrace);
-          // Save to a file or do whatever you want
         }
       },
     );
@@ -130,7 +134,9 @@ class _FlutoState extends State<Fluto> {
     }
 
     return ChangeNotifierProvider<FlutoProvider>(
-      create: (context) => FlutoProvider(widget.globalContext),
+      create: (context) => FlutoProvider(
+        widget.globalNavigatorKey.currentContext!,
+      ),
       builder: (context, child) {
         return child ?? Container();
       },

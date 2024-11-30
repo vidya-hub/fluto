@@ -1,7 +1,9 @@
-import 'package:example/core/fluto/fluto_storage.dart';
 import 'package:example/pages/home_page.dart';
 import 'package:fluto_core/fluto.dart';
 import 'package:flutter/material.dart';
+
+final GlobalKey<NavigatorState> globalNavigatorKey =
+    GlobalKey<NavigatorState>();
 
 void main(
   List<String> args,
@@ -17,10 +19,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: globalNavigatorKey,
       theme: ThemeData.dark(),
       home: Builder(
         builder: (context) => Fluto(
-          globalContext: context,
+          globalNavigatorKey: globalNavigatorKey,
           child: const HomePage(),
         ),
       ),

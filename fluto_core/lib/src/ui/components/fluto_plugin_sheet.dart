@@ -51,7 +51,7 @@ Future<void> showFlutoBottomSheet(BuildContext context) async {
                             Theme.of(context).cardColor,
                             Theme.of(context).secondaryHeaderColor,
                           ),
-                          child: FlutoSheetListTile(plugin: plugin),
+                          child: FlutoTile(plugin: plugin),
                         );
                       },
                       gridDelegate:
@@ -70,11 +70,11 @@ Future<void> showFlutoBottomSheet(BuildContext context) async {
   );
 }
 
-class FlutoSheetListTile extends StatelessWidget {
-  const FlutoSheetListTile({
-    Key? key,
+class FlutoTile extends StatelessWidget {
+  const FlutoTile({
+    super.key,
     required this.plugin,
-  }) : super(key: key);
+  });
 
   final Pluggable plugin;
 

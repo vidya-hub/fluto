@@ -1,7 +1,6 @@
 import 'package:fluto_core/fluto.dart';
 import 'package:fluto_core/src/logger/logger_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class LogViewer extends StatefulWidget {
   const LogViewer({super.key});
@@ -13,6 +12,7 @@ class LogViewer extends StatefulWidget {
 class _LogViewerState extends State<LogViewer>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final logProvider = ValueNotifier(FlutoLoggerProvider());
 
   @override
   void initState() {
@@ -41,41 +41,41 @@ class _LogViewerState extends State<LogViewer>
           }).toList(),
         ),
       ),
-      body: Consumer<FlutoLoggerProvider>(
+      body: ValueListenableBuilder(
+        valueListenable: logProvider,
         builder: (context, provider, _) {
           return TabBarView(
             controller: _tabController,
-            children: FlutoLogType.values.map(
-              (logType) {
-                List<FlutoLog> logs;
-                switch (logType) {
-                  case FlutoLogType.debug:
-                    logs = provider.debugLogs;
-                    break;
-                  case FlutoLogType.info:
-                    logs = provider.infoLogs;
-                    break;
-                  case FlutoLogType.warning:
-                    logs = provider.warningLogs;
-                    break;
-                  case FlutoLogType.error:
-                    logs = provider.errorLogs;
-                    break;
-                }
-                print(logs.length);
-                return ListView.builder(
-                  itemCount: logs.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(logs[index].logMessage),
-                    );
-                  },
-                );
-              },
-            ).toList(),
+            children: [
+              LogsTab(logs: provider.debugLogs),
+              LogsTab(logs: provider.infoLogs),
+              LogsTab(logs: provider.warningLogs),
+              LogsTab(logs: provider.errorLogs),
+            ],
           );
         },
       ),
+    );
+  }
+}
+
+class LogsTab extends StatelessWidget {
+  final List<FlutoLog> logs;
+
+  const LogsTab({super.key, required this.logs});
+
+  @override
+  Widget build(BuildContext context) {
+    print("log length ${logs.length}");
+    return ListView.builder(
+      itemCount: logs.length,
+      itemBuilder: (context, index) {
+        final log = logs[index];
+        return ListTile(
+          title: Text(log.logMessage),
+          subtitle: Text(log.logTime.toString()),
+        );
+      },
     );
   }
 }
