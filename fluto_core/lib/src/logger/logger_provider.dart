@@ -1,13 +1,14 @@
+import 'dart:developer';
 import 'package:fluto_core/src/logger/fluto_logger.dart';
 import 'package:fluto_core/src/utils/enums.dart';
 import 'package:flutter/foundation.dart';
 
 class FlutoLoggerProvider with ChangeNotifier {
-  final Map<FlutoLogType, List<FlutoLog>> _logs = {};
-  final List<FlutoLog> debugLogs = [];
-  final List<FlutoLog> infoLogs = [];
-  final List<FlutoLog> warningLogs = [];
-  final List<FlutoLog> errorLogs = [];
+  List<FlutoLog> debugLogs = [];
+  List<FlutoLog> infoLogs = [];
+  List<FlutoLog> warningLogs = [];
+  List<FlutoLog> errorLogs = [];
+  List<FlutoLog> printLogs = [];
 
   List<FlutoLog> logs({
     FlutoLogType type = FlutoLogType.debug,
@@ -21,23 +22,62 @@ class FlutoLoggerProvider with ChangeNotifier {
         return warningLogs;
       case FlutoLogType.error:
         return errorLogs;
+      case FlutoLogType.print:
+        return printLogs;
       default:
-        return [];
+        return printLogs;
     }
   }
 
   void insertDebugLog(String message) {
-    _logs[FlutoLogType.debug] = _logs[FlutoLogType.info] ?? [];
+    log(message, name: FlutoLogType.debug.name);
+    debugLogs = [
+      ...debugLogs,
+      FlutoLog(
+        logMessage: message,
+        logType: FlutoLogType.debug,
+        logTime: DateTime.now(),
+      )
+    ];
+    notifyListeners();
+  }
+
+  void insertPrintLog(String message) {
+    log(message, name: FlutoLogType.print.name);
+    printLogs = [
+      ...printLogs,
+      FlutoLog(
+        logMessage: message,
+        logType: FlutoLogType.print,
+        logTime: DateTime.now(),
+      )
+    ];
     notifyListeners();
   }
 
   void insertInfoLog(String message) {
-    _logs[FlutoLogType.info] = _logs[FlutoLogType.info] ?? [];
+    log(message, name: FlutoLogType.info.name);
+    infoLogs = [
+      ...infoLogs,
+      FlutoLog(
+        logMessage: message,
+        logType: FlutoLogType.info,
+        logTime: DateTime.now(),
+      ),
+    ];
     notifyListeners();
   }
 
   void insertWarningLog(String message) {
-    _logs[FlutoLogType.warning] = _logs[FlutoLogType.warning] ?? [];
+    log(message, name: FlutoLogType.warning.name);
+    warningLogs = [
+      ...warningLogs,
+      FlutoLog(
+        logMessage: message,
+        logType: FlutoLogType.warning,
+        logTime: DateTime.now(),
+      ),
+    ];
     notifyListeners();
   }
 
@@ -46,12 +86,15 @@ class FlutoLoggerProvider with ChangeNotifier {
     Object? error,
     StackTrace? stackTrace,
   }) {
-    _logs[FlutoLogType.error] = _logs[FlutoLogType.error] ?? [];
-    notifyListeners();
-  }
-
-  void clearLogs() {
-    _logs.clear();
+    log(message, name: FlutoLogType.error.name);
+    errorLogs = [
+      ...errorLogs,
+      FlutoLog(
+        logMessage: message,
+        logType: FlutoLogType.error,
+        logTime: DateTime.now(),
+      ),
+    ];
     notifyListeners();
   }
 

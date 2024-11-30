@@ -3,13 +3,14 @@ import 'package:fluto_core/fluto.dart';
 import 'package:fluto_core/src/logger/log_viewer.dart';
 
 abstract class FlutoPluginRegistrar {
-  static final Map<String, Pluggable> _plugins = {
+  static Map<String, Pluggable> defaultPlugins = {
     "Log-Viewer": ScreenLauncherPlugin(
       devIdentifier: 'one',
       screen: const LogViewer(),
       name: "Log-Viewer",
     ),
   };
+  static final Map<String, Pluggable> _plugins = {};
 
   static Map<String, Pluggable> get plugins => _plugins;
   static List<Pluggable> get pluginList => _plugins.values.toList();

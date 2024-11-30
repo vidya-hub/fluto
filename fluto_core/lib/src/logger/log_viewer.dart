@@ -42,40 +42,72 @@ class _LogViewerState extends State<LogViewer>
         ),
       ),
       body: Consumer<FlutoLoggerProvider>(
-        builder: (context, provider, _) {
+        builder: (context, logProvider, child) {
           return TabBarView(
             controller: _tabController,
-            children: FlutoLogType.values.map(
-              (logType) {
-                List<FlutoLog> logs;
-                switch (logType) {
-                  case FlutoLogType.debug:
-                    logs = provider.debugLogs;
-                    break;
-                  case FlutoLogType.info:
-                    logs = provider.infoLogs;
-                    break;
-                  case FlutoLogType.warning:
-                    logs = provider.warningLogs;
-                    break;
-                  case FlutoLogType.error:
-                    logs = provider.errorLogs;
-                    break;
-                }
-                print(logs.length);
-                return ListView.builder(
-                  itemCount: logs.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(logs[index].logMessage),
-                    );
-                  },
-                );
-              },
-            ).toList(),
+            children: FlutoLogType.values.map((logType) {
+              return LogsTab(
+                logs: logProvider.logs(type: logType),
+                logType: logType,
+              );
+            }).toList(),
           );
         },
       ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          ...FlutoLogType.values.map(
+            (logType) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: FloatingActionButton(
+                  child: Center(child: Text(logType.name)),
+                  onPressed: () {
+                    FlutoLog.log(
+                      "Hello, I am ${logType.name} type",
+                      logType: logType,
+                    );
+                    if (_tabController.index != logType.index) {
+                      _tabController.animateTo(logType.index);
+                    }
+                  },
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class LogsTab extends StatelessWidget {
+  final List<FlutoLog> logs;
+  final FlutoLogType logType;
+
+  const LogsTab({
+    super.key,
+    required this.logs,
+    required this.logType,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      key: ValueKey(logs.length),
+      itemCount: logs.length,
+      itemBuilder: (context, index) {
+        final log = logs[index];
+        return ListTile(
+          title: Text(log.logMessage),
+          subtitle: Text(
+            '${log.logTime.year}-${log.logTime.month.toString().padLeft(2, '0')}-${log.logTime.day.toString().padLeft(2, '0')} '
+            '${(log.logTime.hour % 12 == 0 ? 12 : log.logTime.hour % 12).toString().padLeft(2, '0')}:${log.logTime.minute.toString().padLeft(2, '0')}:${log.logTime.second.toString().padLeft(2, '0')} '
+            '${log.logTime.hour < 12 ? 'AM' : 'PM'}',
+          ),
+        );
+      },
     );
   }
 }

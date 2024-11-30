@@ -8,23 +8,25 @@ void runFlutoApp({
   required Widget child,
 }) {
   BindingBase.debugZoneErrorsAreFatal = true;
-  final loggerProvider = FlutoLoggerProvider();
+  FlutoLoggerProvider? loggerProvider;
+
+  loggerProvider = FlutoLoggerProvider();
 
   runZoned(
     () {
       runApp(
-        ChangeNotifierProvider(
-          create: (_) => FlutoLoggerProvider(),
+        ChangeNotifierProvider.value(
+          value: loggerProvider!,
           child: child,
         ),
       );
     },
     zoneSpecification: ZoneSpecification(
       print: (Zone self, ZoneDelegate parent, Zone zone, String line) {
-        loggerProvider.insertDebugLog(line);
+        loggerProvider?.insertPrintLog(line);
       },
       handleUncaughtError: (self, parent, zone, error, stackTrace) {
-        loggerProvider.insertErrorLog(
+        loggerProvider?.insertErrorLog(
           error.toString(),
           error: error,
           stackTrace: stackTrace,

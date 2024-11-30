@@ -1,4 +1,3 @@
-import 'package:example/main.dart';
 import 'package:fluto_core/fluto.dart';
 import 'package:flutter/material.dart';
 
