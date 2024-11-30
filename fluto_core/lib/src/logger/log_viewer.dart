@@ -1,6 +1,7 @@
 import 'package:fluto_core/fluto.dart';
 import 'package:fluto_core/src/logger/logger_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LogViewer extends StatefulWidget {
   const LogViewer({super.key});
@@ -12,7 +13,6 @@ class LogViewer extends StatefulWidget {
 class _LogViewerState extends State<LogViewer>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final logProvider = ValueNotifier(FlutoLoggerProvider());
 
   @override
   void initState() {
@@ -41,19 +41,42 @@ class _LogViewerState extends State<LogViewer>
           }).toList(),
         ),
       ),
-      body: ValueListenableBuilder(
-        valueListenable: logProvider,
-        builder: (context, provider, _) {
+      body: Consumer<FlutoLoggerProvider>(
+        builder: (context, logProvider, child) {
           return TabBarView(
             controller: _tabController,
-            children: [
-              LogsTab(logs: provider.debugLogs),
-              LogsTab(logs: provider.infoLogs),
-              LogsTab(logs: provider.warningLogs),
-              LogsTab(logs: provider.errorLogs),
-            ],
+            children: FlutoLogType.values.map((logType) {
+              return LogsTab(
+                logs: logProvider.logs(type: logType),
+                logType: logType,
+              );
+            }).toList(),
           );
         },
+      ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          ...FlutoLogType.values.map(
+            (logType) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: FloatingActionButton(
+                  child: Center(child: Text(logType.name)),
+                  onPressed: () {
+                    FlutoLog.log(
+                      "Hello, I am ${logType.name} type",
+                      logType: logType,
+                    );
+                    if (_tabController.index != logType.index) {
+                      _tabController.animateTo(logType.index);
+                    }
+                  },
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -61,19 +84,28 @@ class _LogViewerState extends State<LogViewer>
 
 class LogsTab extends StatelessWidget {
   final List<FlutoLog> logs;
+  final FlutoLogType logType;
 
-  const LogsTab({super.key, required this.logs});
+  const LogsTab({
+    super.key,
+    required this.logs,
+    required this.logType,
+  });
 
   @override
   Widget build(BuildContext context) {
-    print("log length ${logs.length}");
     return ListView.builder(
+      key: ValueKey(logs.length),
       itemCount: logs.length,
       itemBuilder: (context, index) {
         final log = logs[index];
         return ListTile(
           title: Text(log.logMessage),
-          subtitle: Text(log.logTime.toString()),
+          subtitle: Text(
+            '${log.logTime.year}-${log.logTime.month.toString().padLeft(2, '0')}-${log.logTime.day.toString().padLeft(2, '0')} '
+            '${(log.logTime.hour % 12 == 0 ? 12 : log.logTime.hour % 12).toString().padLeft(2, '0')}:${log.logTime.minute.toString().padLeft(2, '0')}:${log.logTime.second.toString().padLeft(2, '0')} '
+            '${log.logTime.hour < 12 ? 'AM' : 'PM'}',
+          ),
         );
       },
     );

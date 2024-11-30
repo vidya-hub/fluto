@@ -8,6 +8,7 @@ class FlutoLoggerProvider with ChangeNotifier {
   List<FlutoLog> infoLogs = [];
   List<FlutoLog> warningLogs = [];
   List<FlutoLog> errorLogs = [];
+  List<FlutoLog> printLogs = [];
 
   List<FlutoLog> logs({
     FlutoLogType type = FlutoLogType.debug,
@@ -21,8 +22,10 @@ class FlutoLoggerProvider with ChangeNotifier {
         return warningLogs;
       case FlutoLogType.error:
         return errorLogs;
+      case FlutoLogType.print:
+        return printLogs;
       default:
-        return [];
+        return printLogs;
     }
   }
 
@@ -36,7 +39,19 @@ class FlutoLoggerProvider with ChangeNotifier {
         logTime: DateTime.now(),
       )
     ];
+    notifyListeners();
+  }
 
+  void insertPrintLog(String message) {
+    log(message, name: FlutoLogType.print.name);
+    printLogs = [
+      ...printLogs,
+      FlutoLog(
+        logMessage: message,
+        logType: FlutoLogType.print,
+        logTime: DateTime.now(),
+      )
+    ];
     notifyListeners();
   }
 
