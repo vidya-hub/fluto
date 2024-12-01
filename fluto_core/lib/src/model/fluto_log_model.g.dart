@@ -18,10 +18,10 @@ class FlutoLogModelAdapter extends TypeAdapter<FlutoLogModel> {
     };
     return FlutoLogModel(
       logMessage: fields[0] as String,
-      logType: fields[1] as FlutoLogType,
+      logType: fields[1] as String,
       logTime: fields[2] as DateTime,
-      error: fields[3] as Object?,
-      stackTrace: fields[4] as StackTrace?,
+      errorString: fields[3] as String?,
+      stackTraceString: fields[4] as String?,
     );
   }
 
@@ -36,9 +36,9 @@ class FlutoLogModelAdapter extends TypeAdapter<FlutoLogModel> {
       ..writeByte(2)
       ..write(obj.logTime)
       ..writeByte(3)
-      ..write(obj.error)
+      ..write(obj.errorString)
       ..writeByte(4)
-      ..write(obj.stackTrace);
+      ..write(obj.stackTraceString);
   }
 
   @override

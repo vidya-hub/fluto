@@ -1,109 +1,104 @@
 import 'dart:developer';
-import 'package:fluto_core/src/model/fluto_log_model.dart';
-import 'package:fluto_core/src/utils/enums.dart';
+import 'package:fluto_core/src/extension/fluto_log_extension.dart';
 import 'package:flutter/foundation.dart';
+import 'package:hive/hive.dart';
+import 'package:fluto_core/src/model/fluto_log_model.dart';
+import 'package:fluto_core/src/model/fluto_log_type.dart';
 
 class FlutoLoggerProvider with ChangeNotifier {
-  List<FlutoLogModel> debugLogs = [];
-  List<FlutoLogModel> infoLogs = [];
-  List<FlutoLogModel> warningLogs = [];
-  List<FlutoLogModel> errorLogs = [];
-  List<FlutoLogModel> printLogs = [];
+  static const String _hiveBoxName = 'fluto_logs';
+  Box<FlutoLogModel>? _logBox;
+  List<FlutoLogModel> _localLogData = [];
+  List<FlutoLogModel> get localLogData => List.unmodifiable(_localLogData);
 
-  List<FlutoLogModel> logs({
-    FlutoLogType type = FlutoLogType.debug,
-  }) {
-    switch (type) {
-      case FlutoLogType.debug:
-        return debugLogs;
-      case FlutoLogType.info:
-        return infoLogs;
-      case FlutoLogType.warning:
-        return warningLogs;
-      case FlutoLogType.error:
-        return errorLogs;
-      case FlutoLogType.print:
-        return printLogs;
-      default:
-        return printLogs;
+  Future<void> initHive() async {
+    _logBox = await Hive.openBox<FlutoLogModel>(_hiveBoxName);
+    syncLocalLogs();
+  }
+
+  void syncLocalLogs() {
+    _localLogData = (_logBox?.values ?? []).toList().cast<FlutoLogModel>();
+    print("Log Count: ${_localLogData.length}");
+    notifyListeners();
+  }
+
+  Future<void> _insertLog(
+    String message, {
+    required FlutoLogType type,
+    Object? error,
+    StackTrace? stackTrace,
+    bool printLog = true,
+  }) async {
+    final logEntry = FlutoLogModel(
+      logMessage: message,
+      logType: type.name,
+      logTime: DateTime.now(),
+      errorString: error?.toString() ?? '',
+      stackTraceString: stackTrace?.getFormattedError ?? '',
+    );
+
+    await _logBox?.add(logEntry);
+    if (printLog) {
+      log(message, name: type.name, error: error, stackTrace: stackTrace);
     }
   }
 
-  void insertDebugLog(String message) {
-    log(message, name: FlutoLogType.debug.name);
-    debugLogs = [
-      ...debugLogs,
-      FlutoLogModel(
-        logMessage: message,
-        logType: FlutoLogType.debug,
-        logTime: DateTime.now(),
-      )
-    ];
-    notifyListeners();
+  Future<void> insertDebugLog(String message) async {
+    await _insertLog(message, type: FlutoLogType.debug);
   }
 
-  void insertPrintLog(String message) {
-    log(message, name: FlutoLogType.print.name);
-    printLogs = [
-      ...printLogs,
-      FlutoLogModel(
-        logMessage: message,
-        logType: FlutoLogType.print,
-        logTime: DateTime.now(),
-      )
-    ];
-    notifyListeners();
+  Future<void> insertInfoLog(String message) async {
+    await _insertLog(message, type: FlutoLogType.info);
   }
 
-  void insertInfoLog(String message) {
-    log(message, name: FlutoLogType.info.name);
-    infoLogs = [
-      ...infoLogs,
-      FlutoLogModel(
-        logMessage: message,
-        logType: FlutoLogType.info,
-        logTime: DateTime.now(),
-      ),
-    ];
-    notifyListeners();
+  Future<void> insertWarningLog(String message) async {
+    await _insertLog(message, type: FlutoLogType.warning);
   }
 
-  void insertWarningLog(String message) {
-    log(message, name: FlutoLogType.warning.name);
-    warningLogs = [
-      ...warningLogs,
-      FlutoLogModel(
-        logMessage: message,
-        logType: FlutoLogType.warning,
-        logTime: DateTime.now(),
-      ),
-    ];
-    notifyListeners();
-  }
-
-  void insertErrorLog(
+  Future<void> insertErrorLog(
     String message, {
     Object? error,
     StackTrace? stackTrace,
-  }) {
+  }) async {
     final formattedStackTrace =
-        stackTrace.toString().split('\n').take(5).join('\n');
-
-    log(
-      "Error: $error\nStackTrace:\n$formattedStackTrace",
-      name: FlutoLogType.error.name,
+        stackTrace?.toString().split('\n').take(5).join('\n') ?? '';
+    final errorMessage = "Error: $error\nStackTrace:\n$formattedStackTrace";
+    await _insertLog(
+      errorMessage,
+      type: FlutoLogType.error,
+      error: error,
+      stackTrace: stackTrace,
     );
-    errorLogs = [
-      ...errorLogs,
-      FlutoLogModel(
-        logMessage: message,
-        logType: FlutoLogType.error,
-        logTime: DateTime.now(),
-        error: error,
-        stackTrace: stackTrace,
-      ),
-    ];
-    notifyListeners();
+  }
+
+  Future<void> insertPrintLog(String message) async {
+    await _insertLog(
+      message,
+      type: FlutoLogType.print,
+      printLog: false,
+    );
+  }
+
+  Future<void> clearLogs({FlutoLogType? type}) async {
+    if (type == null) {
+      await _logBox?.clear();
+    } else {
+      final keysToDelete = (_logBox?.keys ?? [])
+          .where((key) => _logBox?.get(key)?.logType == type.name)
+          .toList();
+      for (final key in keysToDelete) {
+        await _logBox?.delete(key);
+      }
+    }
+    syncLocalLogs();
+  }
+
+  List<FlutoLogModel> getAllLogs({FlutoLogType logType = FlutoLogType.debug}) {
+    return _localLogData
+        .where(
+          (element) => element.logType == logType.name,
+        )
+        .toList();
   }
 
   Map<Object?, Object?>? get getLogZones => {

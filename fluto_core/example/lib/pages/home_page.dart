@@ -66,7 +66,7 @@ class _HomePageState extends State<HomePage> {
             const Divider(),
             ElevatedButton(
               onPressed: () {
-                throw Exception("Manual exception triggered for testing");
+                throw Exception("Manual exception triggered for*+ testing");
               },
               child: const Text("Trigger Exception"),
             ),
