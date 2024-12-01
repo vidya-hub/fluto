@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 void showLogDetailsDialog({
   required BuildContext context,
-  required FlutoLog flutoLog,
+  required FlutoLogModel flutoLog,
 }) {
   showDialog(
     context: context,

@@ -84,7 +84,7 @@ class _LogViewerState extends State<LogViewer>
 }
 
 class LogsTab extends StatelessWidget {
-  final List<FlutoLog> logs;
+  final List<FlutoLogModel> logs;
   final FlutoLogType logType;
 
   const LogsTab({

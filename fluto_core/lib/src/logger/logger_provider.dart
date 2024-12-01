@@ -1,16 +1,16 @@
 import 'dart:developer';
-import 'package:fluto_core/src/logger/fluto_logger.dart';
+import 'package:fluto_core/src/model/fluto_log_model.dart';
 import 'package:fluto_core/src/utils/enums.dart';
 import 'package:flutter/foundation.dart';
 
 class FlutoLoggerProvider with ChangeNotifier {
-  List<FlutoLog> debugLogs = [];
-  List<FlutoLog> infoLogs = [];
-  List<FlutoLog> warningLogs = [];
-  List<FlutoLog> errorLogs = [];
-  List<FlutoLog> printLogs = [];
+  List<FlutoLogModel> debugLogs = [];
+  List<FlutoLogModel> infoLogs = [];
+  List<FlutoLogModel> warningLogs = [];
+  List<FlutoLogModel> errorLogs = [];
+  List<FlutoLogModel> printLogs = [];
 
-  List<FlutoLog> logs({
+  List<FlutoLogModel> logs({
     FlutoLogType type = FlutoLogType.debug,
   }) {
     switch (type) {
@@ -33,7 +33,7 @@ class FlutoLoggerProvider with ChangeNotifier {
     log(message, name: FlutoLogType.debug.name);
     debugLogs = [
       ...debugLogs,
-      FlutoLog(
+      FlutoLogModel(
         logMessage: message,
         logType: FlutoLogType.debug,
         logTime: DateTime.now(),
@@ -46,7 +46,7 @@ class FlutoLoggerProvider with ChangeNotifier {
     log(message, name: FlutoLogType.print.name);
     printLogs = [
       ...printLogs,
-      FlutoLog(
+      FlutoLogModel(
         logMessage: message,
         logType: FlutoLogType.print,
         logTime: DateTime.now(),
@@ -59,7 +59,7 @@ class FlutoLoggerProvider with ChangeNotifier {
     log(message, name: FlutoLogType.info.name);
     infoLogs = [
       ...infoLogs,
-      FlutoLog(
+      FlutoLogModel(
         logMessage: message,
         logType: FlutoLogType.info,
         logTime: DateTime.now(),
@@ -72,7 +72,7 @@ class FlutoLoggerProvider with ChangeNotifier {
     log(message, name: FlutoLogType.warning.name);
     warningLogs = [
       ...warningLogs,
-      FlutoLog(
+      FlutoLogModel(
         logMessage: message,
         logType: FlutoLogType.warning,
         logTime: DateTime.now(),
@@ -95,7 +95,7 @@ class FlutoLoggerProvider with ChangeNotifier {
     );
     errorLogs = [
       ...errorLogs,
-      FlutoLog(
+      FlutoLogModel(
         logMessage: message,
         logType: FlutoLogType.error,
         logTime: DateTime.now(),

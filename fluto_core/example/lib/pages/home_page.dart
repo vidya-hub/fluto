@@ -20,7 +20,7 @@ class _HomePageState extends State<HomePage> {
             const Padding(padding: EdgeInsets.all(10)),
             ElevatedButton(
               onPressed: () {
-                FlutoLog.log(
+                FlutoLogModel.log(
                   "This is an informational log",
                   logType: FlutoLogType.info,
                 );
@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage> {
             ),
             ElevatedButton(
               onPressed: () {
-                FlutoLog.log(
+                FlutoLogModel.log(
                   "This is a warning log",
                   logType: FlutoLogType.warning,
                 );
@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
             ),
             ElevatedButton(
               onPressed: () {
-                FlutoLog.log(
+                FlutoLogModel.log(
                   "This is an error log",
                   logType: FlutoLogType.error,
                 );
@@ -47,7 +47,7 @@ class _HomePageState extends State<HomePage> {
             ),
             ElevatedButton(
               onPressed: () {
-                FlutoLog.log(
+                FlutoLogModel.log(
                   "This is a debug log",
                   logType: FlutoLogType.debug,
                 );
@@ -56,7 +56,7 @@ class _HomePageState extends State<HomePage> {
             ),
             ElevatedButton(
               onPressed: () {
-                FlutoLog.log(
+                FlutoLogModel.log(
                   "This is a success log",
                   logType: FlutoLogType.info,
                 );
@@ -84,7 +84,7 @@ class _HomePageState extends State<HomePage> {
                   List<int> numbers = [1, 2, 3];
                   print(numbers[5]); // Index out of range
                 } catch (e, stackTrace) {
-                  FlutoLog.log(
+                  FlutoLogModel.log(
                     "Caught an index error: $e",
                     logType: FlutoLogType.error,
                     error: e,
