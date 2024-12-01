@@ -11,8 +11,7 @@ void runFlutoApp({
   FlutoLoggerProvider? loggerProvider;
 
   loggerProvider = FlutoLoggerProvider();
-
-  runZoned(
+  runZonedGuarded(
     () {
       runApp(
         ChangeNotifierProvider.value(
@@ -21,16 +20,22 @@ void runFlutoApp({
         ),
       );
     },
+    (error, stackTrace) {
+      loggerProvider?.insertErrorLog(
+        error.toString(),
+        error: error,
+        stackTrace: stackTrace,
+      );
+      FlutterError.reportError(FlutterErrorDetails(
+        exception: error,
+        stack: stackTrace,
+        library: 'runFlutoAppGuarded',
+        context: ErrorDescription('An error occurred in a guarded zone.'),
+      ));
+    },
     zoneSpecification: ZoneSpecification(
       print: (Zone self, ZoneDelegate parent, Zone zone, String line) {
         loggerProvider?.insertPrintLog(line);
-      },
-      handleUncaughtError: (self, parent, zone, error, stackTrace) {
-        loggerProvider?.insertErrorLog(
-          error.toString(),
-          error: error,
-          stackTrace: stackTrace,
-        );
       },
     ),
     zoneValues: loggerProvider.getLogZones,

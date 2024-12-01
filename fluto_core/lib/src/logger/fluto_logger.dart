@@ -2,6 +2,18 @@ import 'dart:async';
 import 'package:fluto_core/src/utils/enums.dart';
 import 'dart:developer' as developer;
 
+extension FlutoExtension on FlutoLog {
+  String get getFormattedLogTime {
+    return '${logTime.year}-${logTime.month.toString().padLeft(2, '0')}-${logTime.day.toString().padLeft(2, '0')} '
+        '${(logTime.hour % 12 == 0 ? 12 : logTime.hour % 12).toString().padLeft(2, '0')}:${logTime.minute.toString().padLeft(2, '0')}:${logTime.second.toString().padLeft(2, '0')} '
+        '${logTime.hour < 12 ? 'AM' : 'PM'}';
+  }
+
+  String get getFormattedError {
+    return stackTrace.toString().split('\n').take(5).join('\n');
+  }
+}
+
 class FlutoLog {
   String logMessage = '';
   FlutoLogType logType = FlutoLogType.info;

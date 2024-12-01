@@ -8,6 +8,7 @@ class Navigation {
     required BuildContext globalContext,
     required Widget screen,
   }) {
+    Navigator.pop(globalContext);
     return _ScreenNavigation(
       globalContext: globalContext,
       screen: screen,
