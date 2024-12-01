@@ -86,13 +86,21 @@ class FlutoLoggerProvider with ChangeNotifier {
     Object? error,
     StackTrace? stackTrace,
   }) {
-    log(message, name: FlutoLogType.error.name);
+    final formattedStackTrace =
+        stackTrace.toString().split('\n').take(5).join('\n');
+
+    log(
+      "Error: $error\nStackTrace:\n$formattedStackTrace",
+      name: FlutoLogType.error.name,
+    );
     errorLogs = [
       ...errorLogs,
       FlutoLog(
         logMessage: message,
         logType: FlutoLogType.error,
         logTime: DateTime.now(),
+        error: error,
+        stackTrace: stackTrace,
       ),
     ];
     notifyListeners();
