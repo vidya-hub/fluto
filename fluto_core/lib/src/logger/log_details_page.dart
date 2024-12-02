@@ -1,15 +1,16 @@
 import 'package:fluto_core/fluto.dart';
+import 'package:fluto_core/src/extension/fluto_log_extension.dart';
 import 'package:flutter/material.dart';
 
 void showLogDetailsDialog({
   required BuildContext context,
-  required FlutoLog flutoLog,
+  required FlutoLogModel flutoLog,
 }) {
   showDialog(
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: Text(flutoLog.logType.name.toString()),
+        title: Text(flutoLog.logType.toString()),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -27,14 +28,14 @@ void showLogDetailsDialog({
                   "Stack Trace:",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                Text(flutoLog.getFormattedError),
+                Text(flutoLog.stackTraceString ?? ""),
                 const SizedBox(height: 10),
               ],
               const Text(
                 "Timestamp:",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              Text(flutoLog.getFormattedLogTime.toString()),
+              Text(flutoLog.getFormattedLogTime),
             ],
           ),
         ),

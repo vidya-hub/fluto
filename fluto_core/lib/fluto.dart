@@ -6,6 +6,6 @@ export 'package:fluto_core/src/core/generic_plugins/launcher_plugin/screen_launc
 export 'package:fluto_core/src/core/generic_plugins/launcher_plugin/click_launcher_plugin.dart';
 export 'package:fluto_core/src/ui/components/screen_wrapper.dart';
 export 'package:fluto_core/src/utils/run_fluto_app.dart';
-export 'package:fluto_core/src/logger/fluto_logger.dart';
+export 'package:fluto_core/src/model/fluto_log_model.dart';
 export 'package:fluto_core/src/fluto_app.dart';
-export 'package:fluto_core/src/utils/enums.dart';
+export 'package:fluto_core/src/model/fluto_log_type.dart';

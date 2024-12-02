@@ -1,32 +1,32 @@
 import 'dart:async';
-import 'package:fluto_core/src/utils/enums.dart';
+import 'package:fluto_core/src/model/fluto_log_type.dart';
 import 'dart:developer' as developer;
+import 'package:hive/hive.dart';
+part 'fluto_log_model.g.dart';
 
-extension FlutoExtension on FlutoLog {
-  String get getFormattedLogTime {
-    return '${logTime.year}-${logTime.month.toString().padLeft(2, '0')}-${logTime.day.toString().padLeft(2, '0')} '
-        '${(logTime.hour % 12 == 0 ? 12 : logTime.hour % 12).toString().padLeft(2, '0')}:${logTime.minute.toString().padLeft(2, '0')}:${logTime.second.toString().padLeft(2, '0')} '
-        '${logTime.hour < 12 ? 'AM' : 'PM'}';
-  }
+@HiveType(typeId: 0)
+class FlutoLogModel {
+  @HiveField(0)
+  String logMessage;
 
-  String get getFormattedError {
-    return stackTrace.toString().split('\n').take(5).join('\n');
-  }
-}
+  @HiveField(1)
+  String logType;
 
-class FlutoLog {
-  String logMessage = '';
-  FlutoLogType logType = FlutoLogType.info;
-  DateTime logTime = DateTime.now();
-  Object? error;
-  StackTrace? stackTrace;
+  @HiveField(2)
+  DateTime logTime;
 
-  FlutoLog({
+  @HiveField(3)
+  String? errorString;
+
+  @HiveField(4)
+  String? stackTraceString;
+
+  FlutoLogModel({
     required this.logMessage,
     required this.logType,
     required this.logTime,
-    this.error,
-    this.stackTrace,
+    this.errorString,
+    this.stackTraceString,
   });
 
   static void log(
