@@ -1,8 +1,9 @@
 import 'package:fluto_core/core/navigation.dart';
 import 'package:fluto_core/core/pluggable.dart';
 import 'package:fluto_core/model/plugin_configuration.dart';
-import 'package:fluto_core/src/shared_preference/shared_preference_provider.dart';
-import 'package:fluto_core/src/shared_preference/shared_preference_viewer.dart';
+import 'package:fluto_core/src/storage_view/lib/src/models/storage_driver.dart';
+import 'package:fluto_core/src/storage_view/lib/src/ui/controller/storage_viewer_controller.dart';
+import 'package:fluto_core/src/storage_view/lib/src/ui/storage_view_ui.dart';
 import 'package:flutter/material.dart';
 
 class ScreenLauncherPlugin extends Pluggable {
@@ -36,16 +37,16 @@ class ScreenLauncherPlugin extends Pluggable {
 class InternalStoragePlugin extends Pluggable {
   InternalStoragePlugin({
     required StorageDriver storageDriver,
-  })  : _provider = StorageDriverController(storageDriver: storageDriver),
+  })  : _provider = StorageViewerController(storageDriver),
         super(devIdentifier: "internal_storage_plugin");
 
-  final StorageDriverController _provider;
+  final StorageViewerController _provider;
 
   @override
   Navigation get navigation => Navigation.byScreen(
         globalContext: context!,
-        screen: SharedPreferencesViewer(
-          provider: _provider,
+        screen: StorageView(
+          storageViewerController: _provider,
         ),
       );
 

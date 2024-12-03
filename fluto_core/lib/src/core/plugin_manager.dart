@@ -1,8 +1,6 @@
 import 'package:fluto_core/core/pluggable.dart';
 import 'package:fluto_core/fluto.dart';
 import 'package:fluto_core/src/logger/log_viewer.dart';
-import 'package:fluto_core/src/shared_preference/shared_preference_viewer.dart';
-import 'package:flutter/material.dart';
 
 abstract class FlutoPluginRegistrar {
   static Map<String, Pluggable> defaultPlugins = {
