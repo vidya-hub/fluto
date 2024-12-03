@@ -26,6 +26,7 @@ const _editValueInputDecoration = InputDecoration(
     fontWeight: FontWeight.w600,
   ),
   filled: true,
+  fillColor: Color(0xFF2A2C36),
   contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
   floatingLabelBehavior: FloatingLabelBehavior.never,
   enabledBorder: _textFieldBorder,

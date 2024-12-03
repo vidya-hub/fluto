@@ -83,12 +83,23 @@ class _EditFieldFormState extends State<EditFieldForm> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Edit storage entry',
-                    style: widget.theme.cellTextStyle?.copyWith(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Edit storage entry',
+                        style: widget.theme.cellTextStyle?.copyWith(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.white,),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 30),
                   Text(
@@ -139,8 +150,11 @@ class _EditFieldFormState extends State<EditFieldForm> {
                         height: buttonHeight,
                         child: ElevatedButton.icon(
                           onPressed: _onDeleteTap,
-                          label: const Text('Delete'),
-                          icon: const Icon(Icons.close),
+                          label: const Text(
+                            'Delete',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          icon: const Icon(Icons.close, color: Colors.white),
                           style: ButtonStyle(
                             backgroundColor:
                                 MaterialStateProperty.all(Colors.red),

@@ -61,7 +61,10 @@ class DeleteConfirmationModal extends StatelessWidget {
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all(Colors.red),
                       ),
-                      child: const Text('Yes'),
+                      child: const Text(
+                        'Yes',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   ),
                 ),
