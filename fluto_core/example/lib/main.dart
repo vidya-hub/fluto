@@ -11,6 +11,8 @@ final GlobalKey<NavigatorState> globalNavigatorKey =
 void main(
   List<String> args,
 ) async {
+  WidgetsFlutterBinding.ensureInitialized(); 
+
   final sharedPref = await SharedPreferences.getInstance();
   runFlutoApp(
     child: MyApp(
