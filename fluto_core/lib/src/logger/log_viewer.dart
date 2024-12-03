@@ -105,19 +105,21 @@ class _LogViewerState extends State<LogViewer> {
             controller: _logSearchController,
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.all(10),
-              suffixIcon: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: InkWell(
-                  onTap: () {
-                    _logSearchController.clear();
-                    _flutoLoggerProvider.clearSearch();
-                  },
-                  child: const Icon(
-                    Icons.clear,
-                    size: 25,
-                  ),
-                ),
-              ),
+              suffixIcon: _logSearchController.text.isNotEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: InkWell(
+                        onTap: () {
+                          _logSearchController.clear();
+                          _flutoLoggerProvider.clearSearch();
+                        },
+                        child: const Icon(
+                          Icons.clear,
+                          size: 25,
+                        ),
+                      ),
+                    )
+                  : const IgnorePointer(),
               border: InputBorder.none,
               hintText: "Search ${_selectedLogType.name} logs",
             ),
@@ -241,38 +243,48 @@ class LogsTab extends StatelessWidget {
         child: Text("No ${logType.name} logs found"),
       );
     }
-    return ListView.builder(
-      key: ValueKey(logs.length),
-      itemCount: logs.length,
-      itemBuilder: (context, index) {
-        final log = logs[index];
-        return log.canShow
-            ? Dismissible(
-                key: ValueKey(log.logTime),
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  child: ListTile(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    onTap: () {
-                      showLogDetailsDialog(
-                        context: context,
-                        flutoLog: log,
-                      );
+    return Consumer<FlutoLoggerProvider>(
+      builder: (context, state, _) {
+        return ListView.builder(
+          key: ValueKey(logs.length),
+          itemCount: logs.length,
+          itemBuilder: (context, index) {
+            final log = logs[index];
+            return log.canShow
+                ? Dismissible(
+                    background: const ColoredBox(color: Colors.red),
+                    onDismissed: (direction) {
+                      state.removeLog(log);
                     },
-                    title: Text(
-                      log.logMessage,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
+                    key: ValueKey(log.logTime),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      child: ListTile(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                        onTap: () {
+                          showLogDetailsDialog(
+                            context: context,
+                            flutoLog: log,
+                          );
+                        },
+                        title: Text(
+                          log.logMessage,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle: Text(log.getFormattedLogTime),
+                        tileColor: Theme.of(context).focusColor,
+                      ),
                     ),
-                    subtitle: Text(log.getFormattedLogTime),
-                    tileColor: Theme.of(context).focusColor,
-                  ),
-                ),
-              )
-            : const IgnorePointer();
+                  )
+                : const IgnorePointer();
+          },
+        );
       },
     );
   }

@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 
+import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 
 import 'package:fluto_core/src/model/fluto_log_type.dart';
@@ -35,6 +36,21 @@ class FlutoLogModel {
     this.stackTraceString,
     this.canShow = true,
   });
+  void copy() {
+    String model = '''
+Log Details:
+- Message: $logMessage
+- Type: $logType
+- Time: $logTime
+${errorString != null ? '- Error: $errorString' : ''}
+${stackTraceString != null ? '- Stack Trace: $stackTraceString' : ''}
+- Visibility: ${canShow ? 'Visible' : 'Hidden'}
+'''
+        .trim();
+    Clipboard.setData(
+      ClipboardData(text: model),
+    );
+  }
 
   static void log(
     String message, {
