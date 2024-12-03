@@ -3,7 +3,11 @@ import 'package:provider/provider.dart';
 import 'shared_preference_provider.dart';
 
 class SharedPreferencesViewer extends StatefulWidget {
-  const SharedPreferencesViewer({Key? key}) : super(key: key);
+  const SharedPreferencesViewer({
+    super.key,
+    required this.provider,
+  });
+  final StorageDriverController provider;
 
   @override
   State<SharedPreferencesViewer> createState() =>
@@ -15,7 +19,7 @@ class _SharedPreferencesViewerState extends State<SharedPreferencesViewer> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<SharedPreferencesProvider>(context, listen: false)
+      Provider.of<StorageDriverController>(context, listen: false)
           .loadSharedPreferences();
     });
   }
@@ -29,13 +33,13 @@ class _SharedPreferencesViewerState extends State<SharedPreferencesViewer> {
           IconButton(
             icon: const Icon(Icons.delete_forever),
             onPressed: () {
-              Provider.of<SharedPreferencesProvider>(context, listen: false)
+              Provider.of<StorageDriverController>(context, listen: false)
                   .clearSharedPreferences();
             },
           )
         ],
       ),
-      body: Consumer<SharedPreferencesProvider>(
+      body: Consumer<StorageDriverController>(
         builder: (context, provider, child) {
           final data = provider.sharedPrefsData;
 
@@ -59,7 +63,7 @@ class _SharedPreferencesViewerState extends State<SharedPreferencesViewer> {
                   trailing: IconButton(
                     icon: const Icon(Icons.delete),
                     onPressed: () {
-                      Provider.of<SharedPreferencesProvider>(context,
+                      Provider.of<StorageDriverController>(context,
                               listen: false)
                           .clearSharedPreferences(key: key);
                     },
@@ -94,7 +98,7 @@ class _SharedPreferencesViewerState extends State<SharedPreferencesViewer> {
             ),
             TextButton(
               onPressed: () {
-                Provider.of<SharedPreferencesProvider>(context, listen: false)
+                Provider.of<StorageDriverController>(context, listen: false)
                     .updateSharedPreference(key, controller.text);
                 Navigator.of(context).pop();
               },

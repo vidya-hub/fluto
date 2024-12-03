@@ -1,17 +1,23 @@
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:async';
 
-class SharedPreferencesProvider with ChangeNotifier {
+import 'package:flutter/material.dart';
+
+class StorageDriverController with ChangeNotifier {
   Map<String, dynamic> _sharedPrefsData = {};
   Map<String, dynamic> get sharedPrefsData => _sharedPrefsData;
 
+  final StorageDriver storageDriver;
+
+  StorageDriverController({
+    required this.storageDriver,
+  });
+
   Future<void> loadSharedPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    final keys = prefs.getKeys();
+    final keys = await storageDriver.getKeys();
 
     final data = <String, dynamic>{};
     for (var key in keys) {
-      data[key] = prefs.get(key);
+      data[key] = storageDriver.read(key);
     }
 
     _sharedPrefsData = data;
@@ -19,32 +25,25 @@ class SharedPreferencesProvider with ChangeNotifier {
   }
 
   Future<void> clearSharedPreferences({String? key}) async {
-    final prefs = await SharedPreferences.getInstance();
-
     if (key != null) {
-      await prefs.remove(key);
+      await storageDriver.delete(key);
     } else {
-      await prefs.clear();
+      await storageDriver.clear();
     }
 
     await loadSharedPreferences();
   }
 
   Future<void> updateSharedPreference(String key, dynamic value) async {
-    final prefs = await SharedPreferences.getInstance();
-
-    if (value is int) {
-      await prefs.setInt(key, value);
-    } else if (value is double) {
-      await prefs.setDouble(key, value);
-    } else if (value is bool) {
-      await prefs.setBool(key, value);
-    } else if (value is List<String>) {
-      await prefs.setStringList(key, value);
-    } else {
-      await prefs.setString(key, value.toString());
-    }
-
+    storageDriver.write(key: key, value: value);
     await loadSharedPreferences();
   }
+}
+
+abstract class StorageDriver {
+  FutureOr<Set<String>> getKeys();
+  FutureOr<T?> read<T>(String key);
+  FutureOr<void> write<T>({required String key, required T value});
+  FutureOr<void> delete(String key);
+  FutureOr<void> clear();
 }

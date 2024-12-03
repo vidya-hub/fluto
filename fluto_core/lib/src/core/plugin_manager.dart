@@ -11,12 +11,6 @@ abstract class FlutoPluginRegistrar {
       screen: const LogViewer(),
       name: "Log-Viewer",
     ),
-    "Shared-Preferences-Viwer": ScreenLauncherPlugin(
-      devIdentifier: 'two',
-      screen: const SharedPreferencesViewer(),
-      name: "Shared-Preferences-Viwer",
-      icon: Icons.storage,
-    ),
   };
   static final Map<String, Pluggable> _plugins = {};
 
