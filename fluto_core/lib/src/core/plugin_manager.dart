@@ -1,7 +1,7 @@
 import 'package:fluto_core/core/pluggable.dart';
 import 'package:fluto_core/fluto.dart';
 import 'package:fluto_core/src/logger/log_viewer.dart';
-import 'package:flutter/material.dart';
+import 'package:fluto_core/src/network/network_viewer.dart';
 
 abstract class FlutoPluginRegistrar {
   static Map<String, Pluggable> defaultPlugins = {
@@ -10,20 +10,10 @@ abstract class FlutoPluginRegistrar {
       screen: const LogViewer(),
       name: "Log-Viewer",
     ),
-    "Temp-Log-Viewer": ScreenLauncherPlugin(
-      devIdentifier: 'second',
-      screen: const ColoredBox(color: Colors.purpleAccent),
-      name: "Log-Viewer 2",
-    ),
-    "Temp-Log-Viewer-2": ScreenLauncherPlugin(
-      devIdentifier: 'third',
-      screen: Container(
-        color: Colors.white,
-        child: const Center(
-          child: Text("Hello World"),
-        ),
-      ),
-      name: "Log-Viewer 3",
+    "Network": ScreenLauncherPlugin(
+      devIdentifier: 'two',
+      screen: const NetworkViewer(),
+      name: "Network",
     ),
   };
   static final Map<String, Pluggable> _plugins = {};
