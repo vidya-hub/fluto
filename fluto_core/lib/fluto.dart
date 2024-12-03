@@ -10,3 +10,4 @@ export 'package:fluto_core/src/model/fluto_log_model.dart';
 export 'package:fluto_core/src/fluto_app.dart';
 export 'package:fluto_core/src/model/fluto_log_type.dart';
 export 'src/network/network.dart';
+export 'package:fluto_core/core/fluto_navigation_observer.dart';

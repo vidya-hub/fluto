@@ -1,7 +1,7 @@
 import 'package:fluto_core/fluto.dart';
 import 'package:fluto_core/src/extension/fluto_log_extension.dart';
 import 'package:fluto_core/src/logger/log_details_page.dart';
-import 'package:fluto_core/src/logger/logger_provider.dart';
+import 'package:fluto_core/src/provider/logger_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

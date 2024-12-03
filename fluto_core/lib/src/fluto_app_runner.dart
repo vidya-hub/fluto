@@ -1,17 +1,21 @@
 import 'dart:async';
 
 import 'package:fluto_core/fluto.dart';
+import 'package:fluto_core/src/provider/fluto_navigation_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
-import 'logger/logger_provider.dart';
+import 'provider/logger_provider.dart';
 
 class FlutoAppRunner {
   static final FlutoAppRunner _instance = FlutoAppRunner._internal();
   late FlutoLoggerProvider _loggerProvider;
+  late FlutoNavigationProvider _flutoNavigationProvider;
   late NetworkProvider _networkProvider;
+  static FlutoNavigationProvider get navigationProvider =>
+      _instance._flutoNavigationProvider;
 
   factory FlutoAppRunner() {
     return _instance;
@@ -19,6 +23,7 @@ class FlutoAppRunner {
 
   FlutoAppRunner._internal() {
     _loggerProvider = FlutoLoggerProvider();
+    _flutoNavigationProvider = FlutoNavigationProvider();
   }
   Future<void> initNetworkProvider() async {
     _networkProvider = await NetworkProvider.init();
@@ -49,8 +54,15 @@ class FlutoAppRunner {
           await initNetworkProvider();
 
           runApp(
-            ChangeNotifierProvider.value(
-              value: _loggerProvider,
+            MultiProvider(
+              providers: [
+                ChangeNotifierProvider.value(
+                  value: _loggerProvider,
+                ),
+                ChangeNotifierProvider.value(
+                  value: _flutoNavigationProvider,
+                ),
+              ],
               child: child,
             ),
           );

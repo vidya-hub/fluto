@@ -1,4 +1,6 @@
+import 'package:example/pages/first_page.dart';
 import 'package:example/pages/home_page.dart';
+import 'package:example/pages/second_page.dart';
 import 'package:fluto_core/fluto.dart';
 import 'package:flutter/material.dart';
 
@@ -19,15 +21,23 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      routes: {
+        "/": (context) => Builder(
+              builder: (context) => Fluto(
+                globalNavigatorKey: globalNavigatorKey,
+                child: const HomePage(),
+              ),
+            ),
+        '/first': (context) => const FirstPage(),
+        '/second': (context) => const SecondPage(),
+      },
       debugShowCheckedModeBanner: false,
       navigatorKey: globalNavigatorKey,
+      navigatorObservers: [
+        FlutoNavigationObserver(),
+      ],
       theme: ThemeData.dark(),
-      home: Builder(
-        builder: (context) => Fluto(
-          globalNavigatorKey: globalNavigatorKey,
-          child: const HomePage(),
-        ),
-      ),
+      initialRoute: '/',
     );
   }
 }

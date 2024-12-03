@@ -1,6 +1,7 @@
 import 'package:fluto_core/core/pluggable.dart';
 import 'package:fluto_core/fluto.dart';
 import 'package:fluto_core/src/logger/log_viewer.dart';
+import 'package:fluto_core/src/navigation/navigation_page.dart';
 import 'package:fluto_core/src/network/network_viewer.dart';
 
 abstract class FlutoPluginRegistrar {
@@ -14,6 +15,11 @@ abstract class FlutoPluginRegistrar {
       devIdentifier: 'two',
       screen: const NetworkViewer(),
       name: "Network",
+    ),
+    "Navigation": ScreenLauncherPlugin(
+      devIdentifier: 'three',
+      screen: NavigationPage(),
+      name: "Navigation",
     ),
   };
   static final Map<String, Pluggable> _plugins = {};
