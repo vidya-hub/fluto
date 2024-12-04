@@ -1,6 +1,9 @@
 import 'package:fluto_core/core/navigation.dart';
 import 'package:fluto_core/core/pluggable.dart';
 import 'package:fluto_core/model/plugin_configuration.dart';
+import 'package:fluto_core/src/storage_view/lib/src/models/storage_driver.dart';
+import 'package:fluto_core/src/storage_view/lib/src/ui/controller/storage_viewer_controller.dart';
+import 'package:fluto_core/src/storage_view/lib/src/ui/storage_view_ui.dart';
 import 'package:flutter/material.dart';
 
 class ScreenLauncherPlugin extends Pluggable {
@@ -28,5 +31,29 @@ class ScreenLauncherPlugin extends Pluggable {
         name: name,
         icon: icon,
         description: description,
+      );
+}
+
+class InternalStoragePlugin extends Pluggable {
+  InternalStoragePlugin({
+    required StorageDriver storageDriver,
+  })  : _provider = StorageViewerController(storageDriver),
+        super(devIdentifier: "internal_storage_plugin");
+
+  final StorageViewerController _provider;
+
+  @override
+  Navigation get navigation => Navigation.byScreen(
+        globalContext: context!,
+        screen: StorageView(
+          storageViewerController: _provider,
+        ),
+      );
+
+  @override
+  PluginConfiguration get pluginConfiguration => PluginConfiguration(
+        name: "Internal Storage Viewer",
+        icon: Icons.storage,
+        description: "View and clear shared preferences",
       );
 }

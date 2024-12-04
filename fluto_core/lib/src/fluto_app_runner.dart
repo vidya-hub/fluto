@@ -43,8 +43,12 @@ class FlutoAppRunner {
           await _loggerProvider.initHive();
 
           runApp(
-            ChangeNotifierProvider.value(
-              value: _loggerProvider,
+              MultiProvider(
+              providers: [
+                ChangeNotifierProvider.value(
+                  value: _loggerProvider,
+                ),
+              ],
               child: child,
             ),
           );
