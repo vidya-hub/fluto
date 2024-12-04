@@ -10,7 +10,18 @@ void showLogDetailsDialog({
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: Text(flutoLog.logType.toString()),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(flutoLog.logType.toString()),
+            IconButton(
+              onPressed: () {
+                flutoLog.copy();
+              },
+              icon: const Icon(Icons.copy),
+            )
+          ],
+        ),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

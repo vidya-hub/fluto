@@ -20,6 +20,18 @@ class FlutoLoggerProvider with ChangeNotifier {
     syncLocalLogs();
   }
 
+  Future<void> removeLog(FlutoLogModel logModel) async {
+    final key = _logBox?.keys.firstWhere(
+      (key) => _logBox?.get(key)?.logTime == logModel.logTime,
+      orElse: () => null,
+    );
+    if (key != null) {
+      await _logBox?.delete(key);
+      _localLogData.remove(logModel);
+      notifyListeners();
+    }
+  }
+
   void onDateRangeChange(DateTimeRange range, {String message = ""}) {
     dateTimeRange = range;
     onSearchLogs(

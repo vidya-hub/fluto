@@ -2,7 +2,11 @@ import 'package:cuberto_bottom_bar/cuberto_bottom_bar.dart';
 import 'package:flutter/material.dart';
 
 class AppBottomBar extends StatelessWidget {
-  const AppBottomBar({super.key, required this.tabs, required this.selectedIndex, this.tabChangedCallback});
+  const AppBottomBar(
+      {super.key,
+      required this.tabs,
+      required this.selectedIndex,
+      this.tabChangedCallback});
 
   final List<BottomBarItem> tabs;
   final ValueChanged<int>? tabChangedCallback;
