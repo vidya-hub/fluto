@@ -21,7 +21,7 @@ class Fluto extends StatefulWidget {
     required this.globalNavigatorKey,
   });
 
-  final Widget child;
+  final Widget? child;
   final List<TransitionBuilder> wrappedWidgetList;
   final FlutoStorage storage;
   final List<Pluggable> pluginList;
@@ -132,7 +132,7 @@ class _FlutoState extends State<Fluto> {
 
   @override
   Widget build(BuildContext context) {
-    Widget child = widget.child;
+    Widget? child = widget.child;
 
     for (final widgetBuilder in widget.wrappedWidgetList.reversed) {
       child = widgetBuilder.call(context, widget.child);
@@ -148,8 +148,10 @@ class _FlutoState extends State<Fluto> {
       child: Scaffold(
         body: Stack(
           children: [
-            child,
-            const DraggingButton(),
+            child ?? const SizedBox(),
+             DraggingButton(
+              childNavigatorKey: widget.globalNavigatorKey,
+            ),
           ],
         ),
       ),
