@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:fluto_core/fluto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'logger/logger_provider.dart';
 
@@ -39,6 +41,7 @@ class FlutoAppRunner {
           await onInit();
         }
         try {
+        
           await Hive.initFlutter();
 
           if (!Hive.isAdapterRegistered(FlutoLogModelAdapter().typeId)) {
@@ -49,7 +52,7 @@ class FlutoAppRunner {
           }
 
           BindingBase.debugZoneErrorsAreFatal = false;
-
+          await dotenv.load(fileName: ".env");
           await _loggerProvider.initHive();
           await initNetworkProvider();
 
