@@ -60,7 +60,7 @@ class NetworkFilters extends ChangeNotifier {
     required Set<InfospectNetworkCall> networkCalls,
   }) : _networkCalls = networkCalls;
 
-  final Set<InfospectNetworkCall> _networkCalls;
+  Set<InfospectNetworkCall> _networkCalls;
 
   Set<InfospectNetworkCall> get filteredCalls {
     Iterable<InfospectNetworkCall> calls = Set.from(_networkCalls);
@@ -85,8 +85,7 @@ class NetworkFilters extends ChangeNotifier {
   }
 
   void updateNetworkCalls(Set<InfospectNetworkCall> networkCalls) {
-    _networkCalls.clear();
-    _networkCalls.addAll(networkCalls);
+    _networkCalls = networkCalls;
     notifyListeners();
   }
 

@@ -1,30 +1,40 @@
 import 'package:fluto_core/src/network/infospect_network_call.dart';
-import 'package:fluto_core/src/network/network_provider.dart';
+import 'package:fluto_core/src/network/network_storage.dart';
 import 'package:fluto_core/src/network/ui/details/bloc/interceptor_details_bloc.dart';
 import 'package:fluto_core/src/network/ui/details/screen/interceptor_details_screen.dart';
 import 'package:fluto_core/src/network/ui/filters/network_filters.dart';
 import 'package:fluto_core/src/network/ui/list/components/network_call_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 import '../components/network_call_app_bar.dart';
 
 class NetworksListScreen extends StatefulWidget {
-  const NetworksListScreen({super.key, required this.provider});
-  final NetworkProvider provider;
+  const NetworksListScreen({super.key, required this.storage});
+  final NetworkStorage storage;
 
   @override
   State<NetworksListScreen> createState() => _NetworksListScreenState();
 }
 
 class _NetworksListScreenState extends State<NetworksListScreen> {
-  late final NetworkFilters _networkFilters;
+  late NetworkFilters _networkFilters;
 
   @override
   void initState() {
-    _networkFilters = NetworkFilters(networkCalls: widget.provider.networkCalls);
-    widget.provider.addListener(() => _networkFilters.updateNetworkCalls(widget.provider.networkCalls));
+    _networkFilters = NetworkFilters(networkCalls: widget.storage.networkCall);
+    initStream();
     super.initState();
+  }
+
+  Future<void> initStream() async {
+    await for (final Set<InfospectNetworkCall> event in widget.storage.networkCallStream) {
+      _networkFilters.updateNetworkCalls(event);
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -72,4 +82,6 @@ class _NetworksListScreenState extends State<NetworksListScreen> {
       },
     );
   }
+  
+  
 }
