@@ -52,10 +52,12 @@ class NetworkCallInterceptor extends CoreInterceptor {
     final InfospectNetworkCall networkCall = InfospectNetworkCall(
       response?.hashCode ?? request.hashCode,
       request: networkRequest,
+      method: request.method,
       response: networkResponse,
       error: error != null || stackTrace != null ? networkError : null,
       duration: responseTime == null ? 0 : responseTime.difference(requestTime).inMilliseconds,
       loading: false,
+      server: request.url.host,
     );
     
     storage.addNetworkCall(networkCall);

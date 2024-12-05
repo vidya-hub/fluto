@@ -21,19 +21,14 @@ class _NetworksListScreenState extends State<NetworksListScreen> {
 
   @override
   void initState() {
-    _networkFilters = NetworkFilters(networkCalls: widget.storage.networkCall);
-    initStream();
+    _networkFilters = NetworkFilters(networkCallsGetter: () => widget.storage.networkCall);
+    widget.storage.addListener(() => setState(() {}));
     super.initState();
-  }
-
-  Future<void> initStream() async {
-    await for (final Set<InfospectNetworkCall> event in widget.storage.networkCallStream) {
-      _networkFilters.updateNetworkCalls(event);
-    }
   }
 
   @override
   void dispose() {
+    widget.storage.removeListener(() {});
     super.dispose();
   }
 

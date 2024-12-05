@@ -1,9 +1,10 @@
 import 'package:fluto_core/src/network/infospect_network_call.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
 part 'network_storage_keys.dart';
 
-class NetworkStorage {
+class NetworkStorage extends ChangeNotifier {
   final LazyBox _box;
 
   NetworkStorage(this._box) {
@@ -12,7 +13,9 @@ class NetworkStorage {
 
   Future<void> init() async {
     final futures = await Future.wait(_box.keys.map((key) => getNetworkCall(key)));
-    _networkCall.addAll(futures.whereType<InfospectNetworkCall>());
+    final calls = futures.whereType<InfospectNetworkCall>();
+    _networkCall.addAll(calls);
+    notifyListeners();
   }
 
   final Set<InfospectNetworkCall> _networkCall = {};
@@ -20,6 +23,7 @@ class NetworkStorage {
 
   Future<void> addNetworkCall(InfospectNetworkCall call) async {
     try {
+      _networkCall.add(call);
       await _box.put(call.hashCode, call.toJson());
     } catch (e) {
       throw Exception("Error adding network call\n$e");
@@ -36,9 +40,9 @@ class NetworkStorage {
     }
   }
 
-  Stream<Set<InfospectNetworkCall>> get networkCallStream => _box.watch().map((event) {
-        final data = InfospectNetworkCall.fromJson(event.value);
-        _networkCall.add(data);
-        return _networkCall;
-      });
+  Future<void> clear() async {
+    _networkCall.clear();
+    await _box.clear();
+    notifyListeners();
+  }
 }
