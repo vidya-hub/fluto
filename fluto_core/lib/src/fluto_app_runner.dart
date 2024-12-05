@@ -11,6 +11,7 @@ import 'logger/logger_provider.dart';
 class FlutoAppRunner {
   static final FlutoAppRunner _instance = FlutoAppRunner._internal();
   late FlutoLoggerProvider _loggerProvider;
+  late NetworkProvider _networkProvider;
 
   factory FlutoAppRunner() {
     return _instance;
@@ -18,6 +19,10 @@ class FlutoAppRunner {
 
   FlutoAppRunner._internal() {
     _loggerProvider = FlutoLoggerProvider();
+  }
+  Future<void> initNetworkProvider() async {
+    _networkProvider = await NetworkProvider.init();
+    NetworkCallInterceptor.init(_networkProvider);
   }
 
   Future<void> runFlutoRunner({
@@ -41,10 +46,15 @@ class FlutoAppRunner {
           BindingBase.debugZoneErrorsAreFatal = false;
 
           await _loggerProvider.initHive();
+          await initNetworkProvider();
 
           runApp(
-            ChangeNotifierProvider.value(
-              value: _loggerProvider,
+              MultiProvider(
+              providers: [
+                ChangeNotifierProvider.value(
+                  value: _loggerProvider,
+                ),
+              ],
               child: child,
             ),
           );
