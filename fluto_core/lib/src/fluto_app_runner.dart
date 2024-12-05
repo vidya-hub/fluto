@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:fluto_core/fluto.dart';
+import 'package:fluto_core/src/network/network_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -13,7 +14,7 @@ import 'logger/logger_provider.dart';
 class FlutoAppRunner {
   static final FlutoAppRunner _instance = FlutoAppRunner._internal();
   late FlutoLoggerProvider _loggerProvider;
-  late NetworkProvider _networkProvider;
+  late NetworkStorage _networkStorage;
 
   factory FlutoAppRunner() {
     return _instance;
@@ -22,13 +23,15 @@ class FlutoAppRunner {
   FlutoAppRunner._internal() {
     _loggerProvider = FlutoLoggerProvider();
   }
-  Future<void> initNetworkProvider() async {
-    _networkProvider = await NetworkProvider.init();
-    NetworkCallInterceptor.init(_networkProvider);
-  }
+  
+  // Future<void> initNetworkProvider() async {
+  //   _networkProvider = await NetworkProvider.init();
+  //   NetworkCallInterceptor.init(_networkProvider);
+  // }
 
   Future<void> runFlutoRunner({
     required Widget child,
+    required VoidCallback? onBeforeRebirth,
     Future<void> Function()? onInit,
     void Function(Object error, StackTrace stack)? onError,
   }) async {
@@ -54,16 +57,24 @@ class FlutoAppRunner {
           BindingBase.debugZoneErrorsAreFatal = false;
           await dotenv.load(fileName: ".env");
           await _loggerProvider.initHive();
-          await initNetworkProvider();
+          // await initNetworkProvider();
+
+          final LazyBox box = await Hive.openLazyBox('NetworkProvider');
+          _networkStorage = NetworkStorage(box);
+          await _networkStorage.init();
+          NetworkCallInterceptor.init(_networkStorage);
 
           runApp(
-            MultiProvider(
-              providers: [
-                ChangeNotifierProvider.value(
-                  value: _loggerProvider,
-                ),
-              ],
-              child: child,
+            Phoenix(
+              onBeforeRebirth: onBeforeRebirth,
+              child: MultiProvider(
+                providers: [
+                  ChangeNotifierProvider.value(
+                    value: _loggerProvider,
+                  ),
+                ],
+                child: child,
+              ),
             ),
           );
         } catch (error, stackTrace) {
@@ -106,4 +117,41 @@ class FlutoAppRunner {
   }
 
   FlutoLoggerProvider get loggerProvider => _loggerProvider;
+  NetworkStorage get networkStorage => _networkStorage;
+}
+/// Wrap your root App widget in this widget and call [Phoenix.rebirth] to restart your app.
+class Phoenix extends StatefulWidget {
+  final Widget child;
+  final VoidCallback? onBeforeRebirth;
+
+  const Phoenix({
+    super.key, required this.child,
+    this.onBeforeRebirth,
+  });
+
+  @override
+  State<Phoenix> createState() => _PhoenixState();
+
+  static rebirth(BuildContext context) {
+    context.findAncestorStateOfType<_PhoenixState>()!.restartApp();
+  }
+}
+
+class _PhoenixState extends State<Phoenix> {
+  Key _key = UniqueKey();
+
+  void restartApp() {
+    widget.onBeforeRebirth?.call();
+    setState(() {
+      _key = UniqueKey();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return KeyedSubtree(
+      key: _key,
+      child: widget.child,
+    );
+  }
 }

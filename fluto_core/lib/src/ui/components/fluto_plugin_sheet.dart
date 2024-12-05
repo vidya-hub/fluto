@@ -9,16 +9,23 @@ import 'package:provider/provider.dart';
 Future<void> showFlutoBottomSheet(BuildContext context) async {
   final pluginList = FlutoPluginRegistrar.pluginList;
   final childNavigatorKey = context.read<FlutoProvider>().chilcNavigatorKey;
-
+  final provider = context.read<FlutoProvider>();
   if (Platform.isMacOS) {
-    showDialog(
+    provider.setSheetState(PluginSheetState.clicked);
+    await showDialog(
       context: context,
       builder: (context) {
         return Builder(
           builder: (context) {
-            return DesktopFlutoDialog(
-              pluginList: pluginList,
-              childNavigatorKey: childNavigatorKey,
+            provider.setSheetState(PluginSheetState.clickedAndOpened);
+            return Theme(
+              data: ThemeData.light(useMaterial3: false).copyWith(
+                  colorScheme:
+                      ColorScheme.fromSeed(seedColor: Colors.purpleAccent)),
+              child: DesktopFlutoDialog(
+                pluginList: pluginList,
+                childNavigatorKey: childNavigatorKey,
+              ),
             );
           },
         );
@@ -117,83 +124,89 @@ class _DesktopFlutoDialogState extends State<DesktopFlutoDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: const EdgeInsets.symmetric(
-        horizontal: 80.0,
-        vertical: 48.0,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ListTile(
-            title: const Text("Fluto Project"),
-            trailing: IconButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              icon: const Icon(Icons.close),
-            ),
-          ),
-          const Divider(),
-          Expanded(
-            child: Visibility(
-              visible: widget.pluginList.isNotEmpty,
-              replacement: const Center(
-                child: Text("No Plugin Available"),
+    return PopScope(
+      onPopInvoked: (_) async {
+        final provider = context.read<FlutoProvider>();
+        provider.setSheetState(PluginSheetState.closed);
+      },
+      child: Dialog(
+        insetPadding: const EdgeInsets.symmetric(
+          horizontal: 80.0,
+          vertical: 48.0,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ListTile(
+              title: const Text("Fluto Project"),
+              trailing: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(Icons.close),
               ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 300,
-                    color: Colors.grey.shade800,
-                    child: ListView.builder(
-                      itemCount: widget.pluginList.length,
-                      itemBuilder: (context, index) {
-                        final plugin = widget.pluginList[index];
+            ),
+            const Divider(),
+            Expanded(
+              child: Visibility(
+                visible: widget.pluginList.isNotEmpty,
+                replacement: const Center(
+                  child: Text("No Plugin Available"),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 300,
+                      color: Colors.grey.shade800,
+                      child: ListView.builder(
+                        itemCount: widget.pluginList.length,
+                        itemBuilder: (context, index) {
+                          final plugin = widget.pluginList[index];
 
-                        return Card(
-                          clipBehavior: Clip.antiAlias,
-                          child: ListTile(
-                            selected: selectedPluginIndex == index,
-                            onTap: () {
-                              if (selectedPluginIndex == index) {
-                                return;
-                              }
-                              plugin.navigation.onLaunch.call();
-                              setState(() {
-                                selectedPluginIndex = index;
-                              });
+                          return Card(
+                            clipBehavior: Clip.antiAlias,
+                            child: ListTile(
+                              selected: selectedPluginIndex == index,
+                              onTap: () {
+                                if (selectedPluginIndex == index) {
+                                  return;
+                                }
+                                plugin.navigation.onLaunch.call();
+                                setState(() {
+                                  selectedPluginIndex = index;
+                                });
+                              },
+                              title: Text(
+                                plugin.pluginConfiguration.name,
+                              ),
+                              leading: Icon(
+                                plugin.pluginConfiguration.icon,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: Navigator(
+                        key: widget.childNavigatorKey,
+                        onGenerateRoute: (settings) {
+                          return MaterialPageRoute(
+                            builder: (context) {
+                              return const Center(
+                                child: Text("No Plugin Selected"),
+                              );
                             },
-                            title: Text(
-                              plugin.pluginConfiguration.name,
-                            ),
-                            leading: Icon(
-                              plugin.pluginConfiguration.icon,
-                            ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: Navigator(
-                      key: widget.childNavigatorKey,
-                      onGenerateRoute: (settings) {
-                        return MaterialPageRoute(
-                          builder: (context) {
-                            return const Center(
-                              child: Text("No Plugin Selected"),
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

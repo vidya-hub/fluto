@@ -71,19 +71,23 @@ class RequestDetailsTopicHelper {
 
   /// general topic data setup
   void _setupGeneralTopics() {
+    final url = call.request?.url ?? Uri();
+    final startTime = call.request?.time;
+    final endTime = call.response?.time;
+
     _generalTopics = (
       topic: 'General',
       body: TopicDetailsBodyList(
         [
           (
-            title: 'Url: ${call.request!.url}',
-            subtitle: 'Server: ${call.server}',
-            other: 'Endpoint: ${call.request!.url.path}',
+            title: 'Url: $url',
+            subtitle: 'Server: ${url.host}',
+            other: 'Endpoint: ${url.path}',
           ),
           (
             title: 'Time:',
-            subtitle: 'Start : ${call.request!.time}',
-            other: call.response != null ? 'Finish : ${call.response!.time.toString()}' : '',
+            subtitle: 'Start : ${startTime.toString()}',
+            other: call.response != null ? 'Finish : ${endTime.toString()}' : '',
           ),
           (title: 'Method: ${call.request!.method}', subtitle: call.method, other: null),
           (
