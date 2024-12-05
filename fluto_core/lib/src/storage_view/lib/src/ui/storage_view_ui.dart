@@ -1,19 +1,16 @@
 import 'package:fluto_core/src/storage_view/lib/src/ui/controller/storage_viewer_controller.dart';
 import 'package:fluto_core/src/storage_view/lib/src/ui/theme/storage_view_theme.dart';
-import 'package:fluto_core/src/storage_view/lib/src/ui/utils/responsive_helper.dart';
-import 'package:fluto_core/src/storage_view/lib/src/ui/widgets/forms/edit/edit_field_form.dart';
 import 'package:fluto_core/src/storage_view/lib/src/ui/widgets/forms/filled_text_field/filled_text_field.dart';
 import 'package:fluto_core/src/storage_view/lib/src/ui/widgets/modals/delete/delete_confirmation_modal.dart';
-import 'package:fluto_core/src/storage_view/lib/src/ui/widgets/responsive/responsive_builder.dart';
 import 'package:fluto_core/src/storage_view/lib/src/ui/widgets/storage_table.dart';
 import 'package:flutter/material.dart';
 
 class StorageView extends StatefulWidget {
   const StorageView({
-    Key? key,
+    super.key,
     required this.storageViewerController,
     this.theme = const StorageViewTheme(),
-  }) : super(key: key);
+  });
 
   final StorageViewTheme theme;
   final StorageViewerController storageViewerController;
@@ -43,12 +40,9 @@ class _StorageViewState extends State<StorageView> {
 
   @override
   Widget build(BuildContext context) {
-    final responsive = ResponsiveHelper.of(context);
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: responsive.isSmallScreen
-          ? widget.theme.cardColor
-          : widget.theme.backgroundColor,
+      backgroundColor: widget.theme.cardColor,
       body: AnimatedBuilder(
         animation: _controller,
         builder: (context, _) {
@@ -100,44 +94,10 @@ class _StorageViewState extends State<StorageView> {
                   ),
                 ),
                 SliverToBoxAdapter(
-                  child: ResponsiveBuilder(
-                    largeScreen: (context) => Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        StorageTable(
-                          theme: widget.theme,
-                          controller: _controller,
-                          storageEnties: storageEnties,
-                        ),
-                        if (_controller.selectedEntry != null)
-                          Expanded(
-                            flex: 1,
-                            child: EditFieldForm(
-                              theme: widget.theme,
-                              margin: EdgeInsets.zero,
-                              entry: _controller.selectedEntry!,
-                              onDeleted: () {
-                                _controller
-                                    .delete(_controller.selectedEntry!.key);
-                              },
-                              onUpdated: (value) {
-                                _controller.update(
-                                  _controller.selectedEntry!.key,
-                                  value,
-                                );
-                              },
-                            ),
-                          ),
-                      ],
-                    ),
-                    smallScreen: (context) => SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: StorageTable(
-                        theme: widget.theme,
-                        controller: _controller,
-                        storageEnties: storageEnties,
-                      ),
-                    ),
+                  child: StorageTable(
+                    theme: widget.theme,
+                    controller: _controller,
+                    storageEnties: storageEnties,
                   ),
                 ),
                 const SliverToBoxAdapter(child: SizedBox(height: 70)),

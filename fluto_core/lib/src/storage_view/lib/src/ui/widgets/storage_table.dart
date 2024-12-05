@@ -1,17 +1,18 @@
+import 'dart:io';
+
 import 'package:fluto_core/src/storage_view/lib/src/ui/controller/storage_viewer_controller.dart';
 import 'package:fluto_core/src/storage_view/lib/src/ui/theme/storage_view_theme.dart';
-import 'package:fluto_core/src/storage_view/lib/src/ui/utils/responsive_helper.dart';
 import 'package:fluto_core/src/storage_view/lib/src/ui/widgets/forms/edit/edit_field_form.dart';
 import 'package:fluto_core/src/storage_view/lib/src/ui/widgets/modals/delete/delete_confirmation_modal.dart';
 import 'package:flutter/material.dart';
 
 class StorageTable extends StatefulWidget {
   const StorageTable({
-    Key? key,
+    super.key,
     required this.theme,
     required this.controller,
     required this.storageEnties,
-  }) : super(key: key);
+  });
 
   final StorageViewerController controller;
   final StorageViewTheme theme;
@@ -26,8 +27,7 @@ class _StorageTableState extends State<StorageTable> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final deleteIconTheme = widget.theme.deleteIconTheme;
-    final responsive = ResponsiveHelper.of(context);
-    final isSmallScreen = responsive.isSmallScreen;
+    bool isSmallScreen = (Platform.isIOS || Platform.isAndroid);
     return Container(
       margin: EdgeInsets.all(isSmallScreen ? 0 : 20),
       padding: EdgeInsets.all(isSmallScreen ? 10 : 20),
@@ -145,11 +145,7 @@ class _StorageTableState extends State<StorageTable> {
   }
 
   void _onCeilTap(MapEntry<String, dynamic> e) {
-    if (ResponsiveHelper.of(context).isSmallScreen) {
-      _showEditDialog(e);
-      return;
-    }
-    widget.controller.selectEntry(e);
+    _showEditDialog(e);
   }
 
   void _showEditDialog(MapEntry<String, dynamic> e) {
@@ -158,7 +154,8 @@ class _StorageTableState extends State<StorageTable> {
       builder: (context) => Dialog(
         insetPadding: const EdgeInsets.all(0),
         backgroundColor: Colors.transparent,
-        child: SingleChildScrollView(
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.5,
           child: EditFieldForm(
             width: double.infinity,
             theme: widget.theme,

@@ -17,9 +17,10 @@ dependencies:
   shared_preferences: ^2.0.17
   flutter_secure_storage: ^4.0.0
 
-  http:
+  http: any
   dio: ^4.0.6
-  chopper:
+  chopper: any
+
   alice:
 
   download: ^1.0.0

@@ -26,12 +26,11 @@ class DraggingButton extends StatelessWidget {
       dragController: flutoProvider.dragController,
       normalShadow: const BoxShadow(
           color: Colors.transparent, offset: Offset(0, 4), blurRadius: 2),
-      child: FloatingActionButton.extended(
+      child: FloatingActionButton(
         backgroundColor: Colors.blueAccent,
-        icon: const Icon(Icons.bug_report),
-        label: const Text("Fluto"),
+        child: const Icon(Icons.bug_report),
         onPressed: () {
-          showFlutoBottomSheet(childNavigatorKey.currentState!.context);
+          showFlutoBottomSheet(childNavigatorKey.currentContext!);
         },
       ),
     );
