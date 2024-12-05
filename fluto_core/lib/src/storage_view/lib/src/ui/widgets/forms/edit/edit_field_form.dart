@@ -1,6 +1,5 @@
 import 'package:fluto_core/src/storage_view/lib/src/extensions/map_entry.dart';
 import 'package:fluto_core/src/storage_view/lib/src/ui/theme/storage_view_theme.dart';
-import 'package:fluto_core/src/storage_view/lib/src/ui/utils/responsive_helper.dart';
 import 'package:fluto_core/src/storage_view/lib/src/ui/utils/validator/validator.dart';
 import 'package:fluto_core/src/storage_view/lib/src/ui/widgets/forms/edit/entry_info.dart';
 import 'package:fluto_core/src/storage_view/lib/src/ui/widgets/forms/edit/typed/bool_selector/bool_selector.dart';
@@ -9,14 +8,14 @@ import 'package:flutter/material.dart';
 
 class EditFieldForm extends StatefulWidget {
   const EditFieldForm({
-    Key? key,
+    super.key,
     required this.theme,
     required this.entry,
     required this.onDeleted,
     required this.onUpdated,
     this.margin,
     this.width,
-  }) : super(key: key);
+  });
 
   final StorageViewTheme theme;
   final MapEntry<String, dynamic> entry;
@@ -56,9 +55,7 @@ class _EditFieldFormState extends State<EditFieldForm> {
 
   @override
   Widget build(BuildContext context) {
-    final double buttonHeight =
-        ResponsiveHelper.of(context).isSmallScreen ? 50 : 40;
-    final isLargeScreen = ResponsiveHelper.of(context).isLargeScreen;
+    const double buttonHeight = 50;
     return Padding(
       padding: widget.margin ?? const EdgeInsets.all(30),
       child: Container(
@@ -94,7 +91,10 @@ class _EditFieldFormState extends State<EditFieldForm> {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close, color: Colors.white,),
+                        icon: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                        ),
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
@@ -143,7 +143,6 @@ class _EditFieldFormState extends State<EditFieldForm> {
                 padding: const EdgeInsets.only(top: 30),
                 child: Row(
                   children: [
-                    if (isLargeScreen) const Spacer(flex: 4),
                     Expanded(
                       flex: 2,
                       child: SizedBox(
