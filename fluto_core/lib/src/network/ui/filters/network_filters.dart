@@ -57,26 +57,27 @@ class FiltersHandler {
 
 class NetworkFilters extends ChangeNotifier {
   NetworkFilters({
-    required Set<InfospectNetworkCall> networkCalls,
-  }) : _networkCalls = networkCalls;
+    required this.networkCallsGetter,
+  });
 
-  Set<InfospectNetworkCall> _networkCalls;
+  final ValueGetter<Set<InfospectNetworkCall>> networkCallsGetter;
+  // Set<InfospectNetworkCall> _networkCalls = <InfospectNetworkCall>{};
 
   Set<InfospectNetworkCall> get filteredCalls {
-    Iterable<InfospectNetworkCall> calls = Set.from(_networkCalls);
+    Iterable<InfospectNetworkCall> calls = Set.from(networkCallsGetter.call());
 
     if (query.isNotEmpty) {
       calls = FiltersHandler.search(query, calls);
     }
-    if (_method.isNotEmpty) {
-      calls = FiltersHandler.filterByMethod(_method, calls);
-    }
-    if (_status.isNotEmpty) {
-      calls = FiltersHandler.filterByStatus(_status, calls);
-    }
-    if (_statusCode != -1) {
-      calls = FiltersHandler.filterByStatusCode(_statusCode, calls);
-    }
+    // if (_method.isNotEmpty) {
+    //   calls = FiltersHandler.filterByMethod(_method, calls);
+    // }
+    // if (_status.isNotEmpty) {
+    //   calls = FiltersHandler.filterByStatus(_status, calls);
+    // }
+    // if (_statusCode != -1) {
+    //   calls = FiltersHandler.filterByStatusCode(_statusCode, calls);
+    // }
     if (selectedMethods.isNotEmpty) {
       calls = FiltersHandler.filterByApiType(selectedMethods, calls);
     }
@@ -84,10 +85,10 @@ class NetworkFilters extends ChangeNotifier {
     return FiltersHandler.sortByTime(calls).toSet();
   }
 
-  void updateNetworkCalls(Set<InfospectNetworkCall> networkCalls) {
-    _networkCalls = networkCalls;
-    notifyListeners();
-  }
+  // void updateNetworkCalls(Set<InfospectNetworkCall> networkCalls) {
+  //   _networkCalls = networkCalls;
+  //   notifyListeners();
+  // }
 
   String _query = '';
   String get query => _query;
@@ -96,23 +97,23 @@ class NetworkFilters extends ChangeNotifier {
     notifyListeners();
   }
 
-  String _method = '';
-  void onMethodChanged(String newMethod) {
-    _method = newMethod;
-    notifyListeners();
-  }
+  // String _method = '';
+  // void onMethodChanged(String newMethod) {
+  //   _method = newMethod;
+  //   notifyListeners();
+  // }
 
-  String _status = '';
-  void onStatusChanged(String newStatus) {
-    _status = newStatus;
-    notifyListeners();
-  }
+  // String _status = '';
+  // void onStatusChanged(String newStatus) {
+  //   _status = newStatus;
+  //   notifyListeners();
+  // }
 
-  int _statusCode = -1;
-  void onStatusCodeChanged(int newStatusCode) {
-    _statusCode = newStatusCode;
-    notifyListeners();
-  }
+  // int _statusCode = -1;
+  // void onStatusCodeChanged(int newStatusCode) {
+  //   _statusCode = newStatusCode;
+  //   notifyListeners();
+  // }
 
   final Set<String> _selectedMethods = <String>{};
   Set<String> get selectedMethods => _selectedMethods;
@@ -128,9 +129,9 @@ class NetworkFilters extends ChangeNotifier {
 
   void clearFilters() {
     _query = '';
-    _method = '';
-    _status = '';
-    _statusCode = -1;
+    // _method = '';
+    // _status = '';
+    // _statusCode = -1;
     notifyListeners();
   }
 }

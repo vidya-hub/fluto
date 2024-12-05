@@ -414,7 +414,7 @@ class InfospectNetworkRequest {
 }
 
 /// Represents an Network call data for the Infospect application.
-class InfospectNetworkCall extends Equatable {
+class InfospectNetworkCall {
   /// The unique identifier for the Network call.
   final int id;
 
@@ -533,25 +533,6 @@ class InfospectNetworkCall extends Equatable {
     );
   }
 
-  @override
-  List<Object?> get props {
-    return [
-      id,
-      createdTime,
-      client,
-      loading,
-      secure,
-      method,
-      endpoint,
-      server,
-      uri,
-      duration,
-      request,
-      response,
-      error,
-    ];
-  }
-
   InfospectNetworkCall copyWith({
     int? id,
     DateTime? createdTime,
@@ -588,4 +569,21 @@ class InfospectNetworkCall extends Equatable {
 
   factory InfospectNetworkCall.fromJson(String source) =>
       InfospectNetworkCall.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! InfospectNetworkCall) {
+      return false;
+    }
+    if (id == other.id && request?.url == other.request?.url && request?.time == other.request?.time) {
+      return true;
+    }
+    if (identical(this, other)) return true;
+    return super == other;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^ request.hashCode;
+  }
 }

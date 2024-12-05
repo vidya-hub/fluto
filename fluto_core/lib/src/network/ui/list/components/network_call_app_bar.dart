@@ -1,3 +1,4 @@
+import 'package:fluto_core/src/fluto_app_runner.dart';
 import 'package:fluto_core/src/network/ui/filters/network_filters.dart';
 import 'package:fluto_core/src/utils/common_widgets/app_adaptive_dialog.dart';
 import 'package:fluto_core/src/utils/common_widgets/conditional_widget.dart';
@@ -155,7 +156,7 @@ class _NetworkCallAppBarState extends State<NetworkCallAppBar> {
                 title: 'Clear Network Call Logs?',
                 body: 'Are you sure you want to clear all network call logs? This will clear up the list.',
                 onPositiveActionClick: () {
-                  // networkListBloc.add(const ClearNetworkLogsClicked());
+                  FlutoAppRunner().networkStorage.clear();
                 },
               );
             }
