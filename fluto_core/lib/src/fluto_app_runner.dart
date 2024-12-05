@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:fluto_core/fluto.dart';
+import 'package:fluto_core/src/network/network_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -11,7 +12,7 @@ import 'logger/logger_provider.dart';
 class FlutoAppRunner {
   static final FlutoAppRunner _instance = FlutoAppRunner._internal();
   late FlutoLoggerProvider _loggerProvider;
-  late NetworkProvider _networkProvider;
+  late NetworkStorage _networkStorage;
 
   factory FlutoAppRunner() {
     return _instance;
@@ -20,10 +21,11 @@ class FlutoAppRunner {
   FlutoAppRunner._internal() {
     _loggerProvider = FlutoLoggerProvider();
   }
-  Future<void> initNetworkProvider() async {
-    _networkProvider = await NetworkProvider.init();
-    NetworkCallInterceptor.init(_networkProvider);
-  }
+  
+  // Future<void> initNetworkProvider() async {
+  //   _networkProvider = await NetworkProvider.init();
+  //   NetworkCallInterceptor.init(_networkProvider);
+  // }
 
   Future<void> runFlutoRunner({
     required Widget child,
@@ -52,7 +54,12 @@ class FlutoAppRunner {
           BindingBase.debugZoneErrorsAreFatal = false;
 
           await _loggerProvider.initHive();
-          await initNetworkProvider();
+          // await initNetworkProvider();
+
+          final LazyBox box = await Hive.openLazyBox('NetworkProvider');
+          _networkStorage = NetworkStorage(box);
+          await _networkStorage.init();
+          NetworkCallInterceptor.init(_networkStorage);
 
           runApp(
             Phoenix(
@@ -107,6 +114,7 @@ class FlutoAppRunner {
   }
 
   FlutoLoggerProvider get loggerProvider => _loggerProvider;
+  NetworkStorage get networkStorage => _networkStorage;
 }
 /// Wrap your root App widget in this widget and call [Phoenix.rebirth] to restart your app.
 class Phoenix extends StatefulWidget {

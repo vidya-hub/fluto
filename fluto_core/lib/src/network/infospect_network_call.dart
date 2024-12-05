@@ -359,6 +359,7 @@ class InfospectNetworkRequest {
       'time': time.microsecondsSinceEpoch,
       'headers': headers,
       'body': body,
+      'url': url.toString(),
       'contentType': contentType,
       'cookies': cookies.map((e) => e.name).toList(),
       'queryParameters': queryParameters,
@@ -393,7 +394,7 @@ class InfospectNetworkRequest {
     }
 
     return InfospectNetworkRequest(
-      method: map['method'],
+      method: map['method'] ?? '',
       url: Uri.parse(map['url']),
       size: map['size'] ?? 0,
       requestTime: DateTime.fromMicrosecondsSinceEpoch(map['time'] ?? 0),

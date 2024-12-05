@@ -14,7 +14,7 @@ class LogViewer extends StatefulWidget {
 
 class _LogViewerState extends State<LogViewer> {
   late FlutoLoggerProvider _flutoLoggerProvider;
-  FlutoLogType _selectedLogType = FlutoLogType.debug;
+  FlutoLogType _selectedLogType = FlutoLogType.print;
   final TextEditingController _logSearchController = TextEditingController();
 
   @override

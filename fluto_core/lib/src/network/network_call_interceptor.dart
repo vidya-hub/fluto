@@ -1,24 +1,28 @@
-import 'dart:math';
 
-import 'package:fluto_core/src/network/network_provider.dart';
+import 'package:fluto_core/src/network/network_storage.dart';
 import 'package:http/http.dart';
 
 import 'infospect_network_call.dart';
 
 abstract class CoreInterceptor {
-  Future<void> onRequest(BaseRequest request, {bool skipContentType});
-  Future<void> onResponse(Response response);
-  Future<void> onError(dynamic error, StackTrace stackTrace);
+  void interceptedRequest(
+    BaseRequest request,
+    Response? response,
+    dynamic error,
+    StackTrace? stackTrace,
+    DateTime requestTime,
+    DateTime? responseTime,
+  );
 }
 
 class NetworkCallInterceptor extends CoreInterceptor {
   static final NetworkCallInterceptor _instance = NetworkCallInterceptor._internal();
-  late final NetworkProvider provider;
+  late final NetworkStorage storage;
   static bool _isInitialized = false;
 
-  factory NetworkCallInterceptor.init(NetworkProvider provider) {
+  factory NetworkCallInterceptor.init(NetworkStorage storage) {
     if (_isInitialized) return _instance;
-    _instance.provider = provider;
+    _instance.storage = storage;
     _isInitialized = true;
     return _instance;
   }
@@ -31,25 +35,33 @@ class NetworkCallInterceptor extends CoreInterceptor {
   }
 
   NetworkCallInterceptor._internal();
-  InfospectNetworkRequest? _networkRequest;
+
 
   @override
-  Future<void> onError(dynamic error, StackTrace stackTrace) async {
-    final networkCall = InfospectNetworkCall(
-      stackTrace.hashCode,
-      request: _networkRequest!,
-      client: '',
-      error: InfospectNetworkError(
-        error: e,
-        stackTrace: stackTrace,
-      ),
+  void interceptedRequest(
+    BaseRequest request,
+    Response? response,
+    dynamic error,
+    StackTrace? stackTrace,
+    DateTime requestTime,
+    DateTime? responseTime,
+  ) {
+    final InfospectNetworkRequest networkRequest = _onRequest(request, requestTime);
+    final InfospectNetworkResponse networkResponse = _onResponse(response, responseTime);
+    final InfospectNetworkError networkError = InfospectNetworkError(error: error, stackTrace: stackTrace);
+    final InfospectNetworkCall networkCall = InfospectNetworkCall(
+      response?.hashCode ?? request.hashCode,
+      request: networkRequest,
+      response: networkResponse,
+      error: error != null || stackTrace != null ? networkError : null,
+      duration: responseTime == null ? 0 : responseTime.difference(requestTime).inMilliseconds,
+      loading: false,
     );
-
-    provider.addCall(networkCall);
+    
+    storage.addNetworkCall(networkCall);
   }
 
-  @override
-  Future<void> onRequest(BaseRequest request, {bool skipContentType = false}) async {
+  InfospectNetworkRequest _onRequest(BaseRequest request, DateTime requestTime) {
     dynamic requestBody = '';
     int requestSize = 0;
     final List<InfospectFormDataFile> files = [];
@@ -84,7 +96,7 @@ class NetworkCallInterceptor extends CoreInterceptor {
       }
       requestSize = request.bodyBytes.length;
     }
-    _networkRequest = InfospectNetworkRequest(
+    return InfospectNetworkRequest(
       body: requestBody,
       size: requestSize,
       formDataFields: fields,
@@ -92,32 +104,20 @@ class NetworkCallInterceptor extends CoreInterceptor {
       headers: request.headers,
       contentType: request.headers['content-type'],
       queryParameters: request.url.queryParameters,
-      requestTime: DateTime.now(),
+      requestTime: requestTime,
       method: request.method,
       url: request.url,
     );
   }
 
-  @override
-  Future<void> onResponse(Response response) async {
+  InfospectNetworkResponse _onResponse(Response? response, DateTime? responseTime) {
     final networkResponse = InfospectNetworkResponse(
-      size: response.bodyBytes.length,
-      headers: response.headers,
-      status: response.statusCode,
-      body: response.body,
-      responseTime: DateTime.now(),
+      size: response == null ? 0 : response.bodyBytes.length,
+      headers: response?.headers,
+      status: response?.statusCode,
+      body: response?.body,
+      responseTime: responseTime,
     );
-
-    final networkCall = InfospectNetworkCall(
-      response.hashCode,
-      request: _networkRequest,
-      response: networkResponse,
-      client: 'Poker',
-      server: response.request!.url.host,
-      duration: _networkRequest?.time == null ? 0: networkResponse.time.difference(_networkRequest!.time).inMilliseconds,
-      loading: false,
-    );
-
-    provider.addCall(networkCall);
+    return networkResponse;
   }
 }
