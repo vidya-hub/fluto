@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class DraggingButton extends StatelessWidget {
+  final GlobalKey<NavigatorState> childNavigatorKey;
   const DraggingButton({
     super.key,
+    required this.childNavigatorKey,
   });
 
   @override
@@ -29,7 +31,7 @@ class DraggingButton extends StatelessWidget {
         icon: const Icon(Icons.bug_report),
         label: const Text("Fluto"),
         onPressed: () {
-          showFlutoBottomSheet(context);
+          showFlutoBottomSheet(childNavigatorKey.currentState!.context);
         },
       ),
     );

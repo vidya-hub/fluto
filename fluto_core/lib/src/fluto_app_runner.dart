@@ -27,12 +27,17 @@ class FlutoAppRunner {
 
   Future<void> runFlutoRunner({
     required Widget child,
+    Future<void> Function()? onInit,
+    void Function(Object error, StackTrace stack)? onError,
   }) async {
+    BindingBase.debugZoneErrorsAreFatal = true;
+
     await runZonedGuarded(
       () async {
-        BindingBase.debugZoneErrorsAreFatal = true;
         WidgetsFlutterBinding.ensureInitialized();
-
+        if (onInit != null) {
+          await onInit();
+        }
         try {
           await Hive.initFlutter();
 
@@ -49,7 +54,7 @@ class FlutoAppRunner {
           await initNetworkProvider();
 
           runApp(
-              MultiProvider(
+            MultiProvider(
               providers: [
                 ChangeNotifierProvider.value(
                   value: _loggerProvider,
@@ -59,6 +64,7 @@ class FlutoAppRunner {
             ),
           );
         } catch (error, stackTrace) {
+          onError?.call(error, stackTrace);
           FlutterError.reportError(
             FlutterErrorDetails(
               exception: error,
@@ -71,6 +77,7 @@ class FlutoAppRunner {
         }
       },
       (error, stackTrace) {
+        onError?.call(error, stackTrace);
         _loggerProvider.insertErrorLog(
           error.toString(),
           error: error,
