@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:headlessfluto/bottom_sheet.dart';
+import 'package:headlessfluto/fluto_log_type.dart';
 import 'package:headlessfluto/provider/headless_fluto_logger_provider.dart';
 import 'package:headlessfluto/provider/supabase_provider.dart';
 import 'package:provider/provider.dart';
@@ -8,10 +10,13 @@ class HeadlessFluto extends StatefulWidget {
   State<HeadlessFluto> createState() => _HeadlessFlutoState();
 }
 
-class _HeadlessFlutoState extends State<HeadlessFluto> {
+class _HeadlessFlutoState extends State<HeadlessFluto>
+    with SingleTickerProviderStateMixin {
   Stream<List<Map<String, dynamic>>>? logStream;
   SupabaseProvider? supabaseProvider;
   HeadlessFlutoLoggerProvider? loggerProvider;
+  TabController? tabController;
+
   @override
   void initState() {
     supabaseProvider = Provider.of<SupabaseProvider>(
@@ -25,60 +30,84 @@ class _HeadlessFlutoState extends State<HeadlessFluto> {
     Future.delayed(Duration.zero, () async {
       await supabaseProvider?.initSupabase();
       logStream = await supabaseProvider?.getLogStream();
+      await supabaseProvider?.setInitialLogData(
+        loggerProvider: loggerProvider!,
+      );
       logStream?.listen((List<Map<String, dynamic>> event) {
         for (var element in event) {
           loggerProvider?.addLog(element);
         }
       });
     });
+    tabController = TabController(
+      length: FlutoLogType.values.length,
+      vsync: this,
+    );
     super.initState();
+  }
+
+  @override
+  dispose() {
+    tabController?.dispose();
+    super.dispose();
+  }
+
+  Future<void> _refreshLogs() async {
+    await supabaseProvider?.setInitialLogData(
+      loggerProvider: loggerProvider!,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: const Text('Log Entries'),
+        bottom: TabBar(
+          controller: tabController,
+          isScrollable: true,
+          tabs: FlutoLogType.values
+              .map((type) => Tab(text: type.toString().split('.').last))
+              .toList(),
+        ),
       ),
-      body: Builder(builder: (context) {
-        if (logStream == null) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        return Consumer<HeadlessFlutoLoggerProvider>(
-            builder: (context, loggerProvider, child) {
-          return ListView.builder(
-            itemCount: loggerProvider.logs.length,
-            itemBuilder: (context, index) {
-              final log = loggerProvider.logs[index];
-              return Card(
-                margin: EdgeInsets.all(8.0),
-                child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Log Name: ${log['log_name']}',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      SizedBox(height: 8.0),
-                      Text('Log Type: ${log['log_type']}'),
-                      SizedBox(height: 8.0),
-                      Text('Created At: ${log['created_at']}'),
-                      SizedBox(height: 8.0),
-                      if (log['error'] != null) ...[
-                        Text('Error: ${log['error']}',
-                            style: TextStyle(color: Colors.red)),
-                        SizedBox(height: 8.0),
-                      ],
-                      if (log['stacktrace'] != null) ...[
-                        Text('Stacktrace: ${log['stacktrace']}'),
-                      ],
-                    ],
-                  ),
-                ),
-              );
-            },
-          );
-        });
+      body: Consumer<HeadlessFlutoLoggerProvider>(
+          builder: (context, loggerProvider, child) {
+        return TabBarView(
+          controller: tabController,
+          children: FlutoLogType.values.map((type) {
+            List<Map<String, dynamic>> logs =
+                loggerProvider.segregatedLogs[type]!;
+            return RefreshIndicator(
+              onRefresh: _refreshLogs,
+              child: logs.isEmpty
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          'No logs available for ${type.toString().split('.').last}..',
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: logs.length,
+                      itemBuilder: (_, index) {
+                        return ListTile(
+                          onTap: () {
+                            showLogDetailsDialog(
+                              context: context,
+                              flutoLog: logs[index],
+                            );
+                          },
+                          title: Text(logs[index]['log_name']),
+                          
+                        );
+                      },
+                    ),
+            );
+          }).toList(),
+        );
       }),
     );
   }
