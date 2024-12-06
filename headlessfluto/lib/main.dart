@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:headlessfluto/headless_fluto.dart';
-import 'package:headlessfluto/provider/headless_fluto_logger_provider.dart';
+import 'package:headlessfluto/provider/fluto_logger_provider.dart';
+import 'package:headlessfluto/provider/fluto_network_provider.dart';
 import 'package:headlessfluto/provider/supabase_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -29,6 +30,9 @@ class _MyAppState extends State<MyApp> {
         ),
         ChangeNotifierProvider(create: (context) {
           return SupabaseProvider();
+        }),
+        ChangeNotifierProvider(create: (context) {
+          return FlutoNetworkProvider();
         }),
       ],
       child: MaterialApp(

@@ -3,3 +3,6 @@
 .fvm/
 fluto_core/.env
 fluto_core/assets/.env
+headlessfluto/.env
+headlessfluto/.env
+./headlessfluto/.env
