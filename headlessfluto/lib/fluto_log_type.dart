@@ -1,11 +1,4 @@
 enum FlutoLogType {
-  debug,
-
-  info,
-
-  warning,
-
-  error,
-
   print,
+  error
 }
