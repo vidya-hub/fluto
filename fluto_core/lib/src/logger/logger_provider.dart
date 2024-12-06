@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:fluto_core/src/extension/fluto_log_extension.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive/hive.dart';
 import 'package:fluto_core/src/model/fluto_log_model.dart';
 import 'package:fluto_core/src/model/fluto_log_type.dart';
@@ -17,13 +15,19 @@ class FlutoLoggerProvider with ChangeNotifier {
   Timer? _debounce;
   DateTimeRange? dateTimeRange;
   Supabase? supabase;
+  FlutoLogType selectedLogType = FlutoLogType.print;
 
-  Future<void> initHive() async {
+  set selectLogType(FlutoLogType logType) {
+    selectedLogType = logType;
+    notifyListeners();
+    getAllLogs();
+  }
+
+  Future<void> initHive({
+    Supabase? supabase,
+  }) async {
     _logBox = await Hive.openBox<FlutoLogModel>(_hiveBoxName);
-    supabase = await Supabase.initialize(
-      url: dotenv.env["URL"] ?? "",
-      anonKey: dotenv.env["ANNON_KEY"] ?? "",
-    );
+    this.supabase = supabase;
     syncLocalLogs();
   }
 
@@ -65,6 +69,66 @@ class FlutoLoggerProvider with ChangeNotifier {
     ).toList();
     dateTimeRange = null;
     notifyListeners();
+  }
+
+  Future<void> showPicker(
+    BuildContext context,
+    TextEditingController logSearchController,
+  ) async {
+    // Show Date Range Picker
+    DateTimeRange? dateTimeRange = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime.now().subtract(
+        const Duration(days: 100),
+      ),
+      lastDate: DateTime.now().add(
+        const Duration(days: 100),
+      ),
+      initialDateRange: this.dateTimeRange,
+    );
+
+    if (dateTimeRange != null) {
+      // Show Time Picker for Start Time
+      TimeOfDay? startTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+        helpText: "Select Start Time",
+      );
+
+      if (startTime == null) return; // User canceled the start time picker
+
+      // Show Time Picker for End Time
+      TimeOfDay? endTime = await showTimePicker(
+        context: context,
+        initialTime: startTime,
+        helpText: "Select End Time",
+      );
+
+      if (endTime == null) return; // User canceled the end time picker
+
+      // Combine date range with start and end times
+      DateTime startDateTime = DateTime(
+        dateTimeRange.start.year,
+        dateTimeRange.start.month,
+        dateTimeRange.start.day,
+        startTime.hour,
+        startTime.minute,
+      );
+
+      DateTime endDateTime = DateTime(
+        dateTimeRange.end.year,
+        dateTimeRange.end.month,
+        dateTimeRange.end.day,
+        endTime.hour,
+        endTime.minute,
+      );
+
+      // Notify the provider with the new date and time range
+      onDateRangeChange(
+        DateTimeRange(start: startDateTime, end: endDateTime),
+        message: logSearchController.text.trim(),
+      );
+    }
   }
 
   void clearSearch() {
@@ -114,6 +178,9 @@ class FlutoLoggerProvider with ChangeNotifier {
 
   void syncLocalLogs() {
     _localLogData = (_logBox?.values ?? []).toList().cast<FlutoLogModel>();
+    _localLogData.sort(
+      (a, b) => b.logTime.compareTo(a.logTime),
+    );
     notifyListeners();
   }
 
@@ -141,6 +208,10 @@ class FlutoLoggerProvider with ChangeNotifier {
           'stacktrace': logEntry.stackTraceString,
         },
       );
+      if (logEntry.logType == selectedLogType.name) {
+        _localLogData = [logEntry, ..._localLogData];
+        notifyListeners();
+      }
     } catch (e) {
       log("Error in insert: $e");
     }
@@ -186,24 +257,20 @@ class FlutoLoggerProvider with ChangeNotifier {
     );
   }
 
-  Future<void> clearLogs({FlutoLogType? type}) async {
-    if (type == null) {
-      await _logBox?.clear();
-    } else {
-      final keysToDelete = (_logBox?.keys ?? [])
-          .where((key) => _logBox?.get(key)?.logType == type.name)
-          .toList();
-      for (final key in keysToDelete) {
-        await _logBox?.delete(key);
-      }
+  Future<void> clearLogs() async {
+    final keysToDelete = (_logBox?.keys ?? [])
+        .where((key) => _logBox?.get(key)?.logType == selectedLogType.name)
+        .toList();
+    for (final key in keysToDelete) {
+      await _logBox?.delete(key);
     }
     syncLocalLogs();
   }
 
-  List<FlutoLogModel> getAllLogs({FlutoLogType logType = FlutoLogType.debug}) {
+  List<FlutoLogModel> getAllLogs() {
     return _localLogData
         .where(
-          (element) => element.logType == logType.name,
+          (element) => element.logType == selectedLogType.name,
         )
         .toList();
   }
