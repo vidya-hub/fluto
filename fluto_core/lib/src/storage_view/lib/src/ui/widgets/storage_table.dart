@@ -154,22 +154,38 @@ class _StorageTableState extends State<StorageTable> {
       builder: (context) => Dialog(
         insetPadding: const EdgeInsets.all(0),
         backgroundColor: Colors.transparent,
-        child: SizedBox(
-          width: MediaQuery.of(context).size.width * 0.5,
-          child: EditFieldForm(
-            width: double.infinity,
-            theme: widget.theme,
-            entry: e,
-            onDeleted: () {
-              widget.controller.delete(e.key);
-              Navigator.pop(context);
-            },
-            onUpdated: (value) {
-              widget.controller.update(e.key, value);
-              Navigator.pop(context);
-            },
-          ),
-        ),
+        child: Platform.isIOS || Platform.isAndroid
+            ? SingleChildScrollView(
+                child: EditFieldForm(
+                  width: double.infinity,
+                  theme: widget.theme,
+                  entry: e,
+                  onDeleted: () {
+                    widget.controller.delete(e.key);
+                    Navigator.pop(context);
+                  },
+                  onUpdated: (value) {
+                    widget.controller.update(e.key, value);
+                    Navigator.pop(context);
+                  },
+                ),
+              )
+            : SizedBox(
+                width: MediaQuery.of(context).size.width * 0.5,
+                child: EditFieldForm(
+                  width: double.infinity,
+                  theme: widget.theme,
+                  entry: e,
+                  onDeleted: () {
+                    widget.controller.delete(e.key);
+                    Navigator.pop(context);
+                  },
+                  onUpdated: (value) {
+                    widget.controller.update(e.key, value);
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
       ),
     );
   }

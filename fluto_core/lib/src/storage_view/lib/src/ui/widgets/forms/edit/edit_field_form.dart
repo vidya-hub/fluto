@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:fluto_core/src/storage_view/lib/src/extensions/map_entry.dart';
 import 'package:fluto_core/src/storage_view/lib/src/ui/theme/storage_view_theme.dart';
+import 'package:fluto_core/src/storage_view/lib/src/ui/utils/responsive_helper.dart';
 import 'package:fluto_core/src/storage_view/lib/src/ui/utils/validator/validator.dart';
 import 'package:fluto_core/src/storage_view/lib/src/ui/widgets/forms/edit/entry_info.dart';
 import 'package:fluto_core/src/storage_view/lib/src/ui/widgets/forms/edit/typed/bool_selector/bool_selector.dart';
@@ -56,6 +59,8 @@ class _EditFieldFormState extends State<EditFieldForm> {
   @override
   Widget build(BuildContext context) {
     const double buttonHeight = 50;
+    final isLargeScreen = ResponsiveHelper.of(context).isLargeScreen;
+
     return Padding(
       padding: widget.margin ?? const EdgeInsets.all(30),
       child: Container(
@@ -143,6 +148,8 @@ class _EditFieldFormState extends State<EditFieldForm> {
                 padding: const EdgeInsets.only(top: 30),
                 child: Row(
                   children: [
+                  if (isLargeScreen&& (Platform.isIOS || Platform.isAndroid)) const Spacer(flex: 4),
+
                     Expanded(
                       flex: 2,
                       child: SizedBox(
