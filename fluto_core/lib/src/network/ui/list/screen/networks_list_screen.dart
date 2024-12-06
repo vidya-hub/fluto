@@ -22,13 +22,14 @@ class _NetworksListScreenState extends State<NetworksListScreen> {
   @override
   void initState() {
     _networkFilters = NetworkFilters(networkCallsGetter: () => widget.storage.networkCall);
-    widget.storage.addListener(() => setState(() {}));
+    widget.storage.addListener(_listener);
     super.initState();
   }
 
+  void _listener() => setState(() {});
   @override
   void dispose() {
-    widget.storage.removeListener(() {});
+    widget.storage.removeListener(_listener);
     super.dispose();
   }
 

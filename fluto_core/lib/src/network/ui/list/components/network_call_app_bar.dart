@@ -68,10 +68,10 @@ abstract class NetworkAction {
     return ActionModel(
       icon: Icons.more_vert,
       actions: const [
-        PopupAction(
-          id: NetworkActionType.share,
-          name: "Share",
-        ),
+        // PopupAction(
+        //   id: NetworkActionType.share,
+        //   name: "Share",
+        // ),
         PopupAction(
           id: NetworkActionType.clear,
           name: "Clear",

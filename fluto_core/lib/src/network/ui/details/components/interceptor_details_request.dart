@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import '../models/details_topic_data.dart';
 import '../models/request_details_topic_helper.dart';
+import '../widgets/trailing_widget.dart';
 
 class InterceptorDetailsRequest extends StatelessWidget {
   final InfospectNetworkCall call;
@@ -55,14 +56,13 @@ class InterceptorDetailsRequest extends StatelessWidget {
     return ExpansionWidget.map(
       title: e.topic,
       map: map,
-      // trailing: trailing != null
-      //     ? TrailingWidget(
-      //         text: trailing.trailing,
-      //         infospect: infospect,
-      //         data: trailing.data,
-      //         beautificationRequired: trailing.beautificationRequired,
-      //       )
-      //     : null,
+      trailing: trailing != null
+          ? TrailingWidget(
+              text: trailing.trailing,
+              data: trailing.data,
+              beautificationRequired: trailing.beautificationRequired,
+            )
+          : null,
     );
   }
 }
