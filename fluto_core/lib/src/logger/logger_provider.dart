@@ -3,9 +3,11 @@ import 'dart:developer';
 import 'package:fluto_core/src/extension/fluto_log_extension.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive/hive.dart';
 import 'package:fluto_core/src/model/fluto_log_model.dart';
 import 'package:fluto_core/src/model/fluto_log_type.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class FlutoLoggerProvider with ChangeNotifier {
   static const String _hiveBoxName = 'fluto_logs';
@@ -14,9 +16,14 @@ class FlutoLoggerProvider with ChangeNotifier {
   List<FlutoLogModel> get localLogData => List.unmodifiable(_localLogData);
   Timer? _debounce;
   DateTimeRange? dateTimeRange;
+  Supabase? supabase;
 
   Future<void> initHive() async {
     _logBox = await Hive.openBox<FlutoLogModel>(_hiveBoxName);
+    supabase = await Supabase.initialize(
+      url: dotenv.env["URL"] ?? "",
+      anonKey: dotenv.env["ANNON_KEY"] ?? "",
+    );
     syncLocalLogs();
   }
 
@@ -124,7 +131,19 @@ class FlutoLoggerProvider with ChangeNotifier {
       errorString: error?.toString() ?? '',
       stackTraceString: stackTrace?.getFormattedError ?? '',
     );
-
+    try {
+      await supabase!.client.from('fluto_logs').insert(
+        {
+          'log_name': message,
+          'log_type': type.name,
+          'created_at': logEntry.logTime.toIso8601String(),
+          'error': logEntry.errorString,
+          'stacktrace': logEntry.stackTraceString,
+        },
+      );
+    } catch (e) {
+      log("Error in insert: $e");
+    }
     await _logBox?.add(logEntry);
     if (printLog) {
       log(message, name: type.name, error: error, stackTrace: stackTrace);
