@@ -4,9 +4,6 @@ import 'package:headlessfluto/fluto_log_type.dart';
 class HeadlessFlutoLoggerProvider extends ChangeNotifier {
   List<Map<String, dynamic>> _logs = [];
   final Map<FlutoLogType, List<Map<String, dynamic>>> _segregatedLogs = {
-    FlutoLogType.debug: [],
-    FlutoLogType.info: [],
-    FlutoLogType.warning: [],
     FlutoLogType.error: [],
     FlutoLogType.print: [],
   };
