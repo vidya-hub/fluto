@@ -1,15 +1,17 @@
 import 'dart:async';
 
 import 'package:fluto_core/fluto.dart';
-import 'package:fluto_core/src/network/network_storage.dart';
+
 import 'package:fluto_core/src/provider/supabase_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:networking_ui/networking_ui.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
+
+import 'fluto_network_storage.dart';
 import 'logger/logger_provider.dart';
 
 class FlutoAppRunner {
@@ -59,7 +61,7 @@ class FlutoAppRunner {
             await onInit();
           }
           final LazyBox box = await Hive.openLazyBox('NetworkProvider');
-          _networkStorage = NetworkStorage(box, _supabaseProvider.supabase);
+          _networkStorage = FlutoNetworkStorage(box: box, supabase: _supabaseProvider.supabase);
           await _networkStorage.init();
           NetworkCallInterceptor.init(_networkStorage);
 

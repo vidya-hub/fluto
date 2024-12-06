@@ -2,7 +2,7 @@ name: fluto_core
 description: "A new Flutter package project."
 version: 0.0.1
 homepage: "https://flutter.dev"
-
+publish_to: none
 environment:
   sdk: ">=3.4.0 <4.0.0"
   flutter: ">=3.22.0"
@@ -25,6 +25,8 @@ dependencies:
   flutter_json_view: ^1.1.5
   supabase_flutter: ^2.8.1
   flutter_dotenv: ^5.2.1
+  networking_ui:
+    path: ../networking_ui
 
 dev_dependencies:
   flutter_test:

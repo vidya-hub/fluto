@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:headlessfluto/model/network_model.dart';
+import 'package:networking_ui/networking_ui.dart';
 
 class FlutoNetworkProvider extends ChangeNotifier {
-  List<NetworkCallModel> _networkCalls = [];
-  List<NetworkCallModel> get networkCalls => _networkCalls;
-  void addNetworkCall(NetworkCallModel networkCall) {
+  List<InfospectNetworkCall> _networkCalls = [];
+  Set<InfospectNetworkCall> get networkCalls => _networkCalls.toSet();
+  void addNetworkCall(InfospectNetworkCall networkCall) {
     _networkCalls = [networkCall, ..._networkCalls];
     notifyListeners();
   }

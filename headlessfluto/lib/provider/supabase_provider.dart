@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:headlessfluto/model/network_model.dart';
 import 'package:headlessfluto/provider/fluto_logger_provider.dart';
 import 'package:headlessfluto/provider/fluto_network_provider.dart';
+import 'package:networking_ui/networking_ui.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseProvider extends ChangeNotifier {
@@ -38,9 +39,8 @@ class SupabaseProvider extends ChangeNotifier {
     });
     await _supabase!.client.from('fluto_network').select().then((value) {
       for (var element in value) {
-        networkProvider.addNetworkCall(NetworkCallModel.fromJson(
-          element,
-        ));
+        final data = jsonDecode((jsonDecode(json.encode(element).toString())["network_data"])) as Map<String, dynamic>;
+        networkProvider.addNetworkCall(InfospectNetworkCall.fromMap(data));
       }
     });
   }
