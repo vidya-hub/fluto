@@ -306,7 +306,7 @@ class NetworkNetworkRequest {
   }
 }
 
-class NetworkNetworkCall {
+class NetworkCallModel {
   final int id;
 
   final DateTime createdTime;
@@ -333,7 +333,7 @@ class NetworkNetworkCall {
 
   final NetworkNetworkError? error;
 
-  NetworkNetworkCall(this.id,
+  NetworkCallModel(this.id,
       {DateTime? time,
       String endpoint = '',
       this.client = '',
@@ -367,8 +367,8 @@ class NetworkNetworkCall {
     };
   }
 
-  factory NetworkNetworkCall.fromMap(dynamic map) {
-    return NetworkNetworkCall(
+  factory NetworkCallModel.fromMap(dynamic map) {
+    return NetworkCallModel(
       map['id'] as int,
       time: DateTime.fromMillisecondsSinceEpoch((map['createdTime']??0) as int),
       client:( map['client'] ?? "")as String,
@@ -378,7 +378,7 @@ class NetworkNetworkCall {
       endpoint: (map['endpoint']??"") as String,
       server: (map['server']??"") as String,
       uri: (map['uri']??"") as String,
-      duration:int.tryParse(map['duration']??"")??0,
+      duration:(map['duration']),
       request: map['request'] != null
           ? NetworkNetworkRequest.fromMap(map['request'])
           : null,
@@ -391,7 +391,7 @@ class NetworkNetworkCall {
     );
   }
 
-  NetworkNetworkCall copyWith({
+  NetworkCallModel copyWith({
     int? id,
     DateTime? createdTime,
     String? client,
@@ -406,7 +406,7 @@ class NetworkNetworkCall {
     NetworkNetworkResponse? response,
     NetworkNetworkError? error,
   }) {
-    return NetworkNetworkCall(
+    return NetworkCallModel(
       id ?? this.id,
       time: createdTime ?? this.createdTime,
       client: client ?? this.client,
@@ -425,12 +425,12 @@ class NetworkNetworkCall {
 
   String toJson() => json.encode(toMap());
 
-  factory NetworkNetworkCall.fromJson(dynamic source) =>
-      NetworkNetworkCall.fromMap((source) as Map<String, dynamic>);
+  factory NetworkCallModel.fromJson(dynamic source) =>
+      NetworkCallModel.fromMap(jsonDecode((jsonDecode(json.encode(source).toString())["network_data"])) as Map<String, dynamic>);
 
   @override
   bool operator ==(Object other) {
-    if (other is! NetworkNetworkCall) {
+    if (other is! NetworkCallModel) {
       return false;
     }
     if (id == other.id &&

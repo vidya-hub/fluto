@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:headlessfluto/model/network_model.dart';
@@ -36,7 +38,7 @@ class SupabaseProvider extends ChangeNotifier {
     });
     await _supabase!.client.from('fluto_network').select().then((value) {
       for (var element in value) {
-        networkProvider.addNetworkCall(NetworkNetworkCall.fromJson(
+        networkProvider.addNetworkCall(NetworkCallModel.fromJson(
           element,
         ));
       }

@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:headlessfluto/bottom_sheet.dart';
 import 'package:headlessfluto/model/network_model.dart';
+import 'package:headlessfluto/network_call_item.dart';
 import 'package:provider/provider.dart';
 import 'package:headlessfluto/fluto_log_type.dart';
 import 'package:headlessfluto/provider/supabase_provider.dart';
@@ -47,7 +50,7 @@ class _HeadlessFlutoState extends State<HeadlessFluto>
       var networkStream = await supabaseProvider?.getNetworkStream();
       networkStream?.listen((List<Map<String, dynamic>> event) {
         for (var element in event) {
-          networkProvider?.addNetworkCall(NetworkNetworkCall.fromJson(
+          networkProvider?.addNetworkCall(NetworkCallModel.fromJson(
             element,
           ));
         }
@@ -116,14 +119,29 @@ class _HeadlessFlutoState extends State<HeadlessFluto>
                             : ListView.builder(
                                 itemCount: logs.length,
                                 itemBuilder: (_, index) {
-                                  return ListTile(
-                                    onTap: () {
-                                      showLogDetailsDialog(
-                                        context: context,
-                                        flutoLog: logs[index],
-                                      );
-                                    },
-                                    title: Text(logs[index].toString()),
+                                  var log = logs[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 5,
+                                    ),
+                                    child: ListTile(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(7),
+                                      ),
+                                      onTap: () {
+                                        showLogDetailsDialog(
+                                          context: context,
+                                          flutoLog: log,
+                                        );
+                                      },
+                                      title: Text(
+                                        log.toString(),
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      tileColor: Theme.of(context).focusColor,
+                                    ),
                                   );
                                 },
                               ),
@@ -136,12 +154,12 @@ class _HeadlessFlutoState extends State<HeadlessFluto>
           ),
           Consumer<FlutoNetworkProvider>(
             builder: (context, networkProvider, child) {
-              List<NetworkNetworkCall> networkCalls =
+              List<NetworkCallModel> networkCalls =
                   networkProvider.networkCalls;
               return RefreshIndicator(
                 onRefresh: _refreshLogs,
                 child: networkCalls.isEmpty
-                    ? Center(
+                    ? const Center(
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Text('No network calls available.'),
@@ -151,8 +169,9 @@ class _HeadlessFlutoState extends State<HeadlessFluto>
                         itemCount: networkCalls.length,
                         itemBuilder: (_, index) {
                           return ListTile(
-                            title: Text(
-                              networkCalls[index].toString(),
+                            title: NetworkCallItem(
+                              networkCall: networkCalls[index],
+                              onItemClicked: (item) {},
                             ),
                           );
                         },
