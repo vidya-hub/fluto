@@ -4,12 +4,6 @@ import 'package:fluto_core/src/fluto_app_runner.dart';
 import 'package:fluto_core/src/logger/log_viewer.dart';
 import 'package:networking_ui/networking_ui.dart';
 
-
-
-
-
-
-
 abstract class FlutoPluginRegistrar {
   static Map<String, Pluggable> defaultPlugins = {
     "Log-Viewer": ScreenLauncherPlugin(
