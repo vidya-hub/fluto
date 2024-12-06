@@ -20,8 +20,10 @@ Future<void> showFlutoBottomSheet(BuildContext context) async {
             provider.setSheetState(PluginSheetState.clickedAndOpened);
             return Theme(
               data: ThemeData.light(useMaterial3: false).copyWith(
-                  colorScheme:
-                      ColorScheme.fromSeed(seedColor: Colors.purpleAccent)),
+                colorScheme: ColorScheme.fromSeed(
+                  seedColor: Colors.purpleAccent,
+                ),
+              ),
               child: DesktopFlutoDialog(
                 pluginList: pluginList,
                 childNavigatorKey: childNavigatorKey,
@@ -43,52 +45,59 @@ Future<void> showFlutoBottomSheet(BuildContext context) async {
         builder: (BuildContext _) {
           final provider = context.read<FlutoProvider>();
           provider.setSheetState(PluginSheetState.clickedAndOpened);
-          return PopScope(
-            onPopInvoked: (_) async {
-              provider.setSheetState(PluginSheetState.closed);
-            },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ListTile(
-                  title: const Text("Fluto Project"),
-                  trailing: IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      provider.setSheetState(PluginSheetState.closed);
-                    },
-                    icon: const Icon(Icons.close),
-                  ),
-                ),
-                const Divider(),
-                Expanded(
-                  child: Visibility(
-                    visible: pluginList.isNotEmpty,
-                    replacement:
-                        const Center(child: Text("No Plugin Available")),
-                    child: GridView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      itemCount: pluginList.length,
-                      itemBuilder: (context, index) {
-                        final plugin = pluginList[index];
-
-                        return Card(
-                          clipBehavior: Clip.antiAlias,
-                          color: Color.alphaBlend(
-                            Theme.of(context).cardColor,
-                            Theme.of(context).secondaryHeaderColor,
-                          ),
-                          child: FlutoTile(plugin: plugin),
-                        );
+          return Theme(
+            data: ThemeData.light(useMaterial3: false).copyWith(
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: Colors.purpleAccent,
+              ),
+            ),
+            child: PopScope(
+              onPopInvoked: (_) async {
+                provider.setSheetState(PluginSheetState.closed);
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ListTile(
+                    title: const Text("Fluto Project"),
+                    trailing: IconButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        provider.setSheetState(PluginSheetState.closed);
                       },
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
+                      icon: const Icon(Icons.close),
+                    ),
+                  ),
+                  const Divider(),
+                  Expanded(
+                    child: Visibility(
+                      visible: pluginList.isNotEmpty,
+                      replacement:
+                          const Center(child: Text("No Plugin Available")),
+                      child: GridView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        itemCount: pluginList.length,
+                        itemBuilder: (context, index) {
+                          final plugin = pluginList[index];
+
+                          return Card(
+                            clipBehavior: Clip.antiAlias,
+                            color: Color.alphaBlend(
+                              Theme.of(context).cardColor,
+                              Theme.of(context).secondaryHeaderColor,
+                            ),
+                            child: FlutoTile(plugin: plugin),
+                          );
+                        },
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },

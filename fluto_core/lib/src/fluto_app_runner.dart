@@ -31,7 +31,6 @@ class FlutoAppRunner {
 
   Future<void> runFlutoRunner({
     required Widget child,
-    required VoidCallback? onBeforeRebirth,
     Future<void> Function()? onInit,
     void Function(Object error, StackTrace stack)? onError,
   }) async {
@@ -65,16 +64,13 @@ class FlutoAppRunner {
           NetworkCallInterceptor.init(_networkStorage);
 
           runApp(
-            Phoenix(
-              onBeforeRebirth: onBeforeRebirth,
-              child: MultiProvider(
-                providers: [
-                  ChangeNotifierProvider.value(
-                    value: _loggerProvider,
-                  ),
-                ],
-                child: child,
-              ),
+            MultiProvider(
+              providers: [
+                ChangeNotifierProvider.value(
+                  value: _loggerProvider,
+                ),
+              ],
+              child: child,
             ),
           );
         } catch (error, stackTrace) {
@@ -118,40 +114,4 @@ class FlutoAppRunner {
 
   FlutoLoggerProvider get loggerProvider => _loggerProvider;
   NetworkStorage get networkStorage => _networkStorage;
-}
-/// Wrap your root App widget in this widget and call [Phoenix.rebirth] to restart your app.
-class Phoenix extends StatefulWidget {
-  final Widget child;
-  final VoidCallback? onBeforeRebirth;
-
-  const Phoenix({
-    super.key, required this.child,
-    this.onBeforeRebirth,
-  });
-
-  @override
-  State<Phoenix> createState() => _PhoenixState();
-
-  static rebirth(BuildContext context) {
-    context.findAncestorStateOfType<_PhoenixState>()!.restartApp();
-  }
-}
-
-class _PhoenixState extends State<Phoenix> {
-  Key _key = UniqueKey();
-
-  void restartApp() {
-    widget.onBeforeRebirth?.call();
-    setState(() {
-      _key = UniqueKey();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return KeyedSubtree(
-      key: _key,
-      child: widget.child,
-    );
-  }
 }
