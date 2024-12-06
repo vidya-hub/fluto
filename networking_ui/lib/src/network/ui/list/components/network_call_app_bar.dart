@@ -79,9 +79,9 @@ abstract class NetworkAction {
 }
 
 class NetworkCallAppBar extends StatefulWidget implements PreferredSizeWidget {
-  const NetworkCallAppBar({super.key, this.hasBottom = false, required this.filters, required this.onClearLogs}) : isDesktop = false;
+  const NetworkCallAppBar({super.key, this.hasBottom = false, required this.filters, required this.onClearLogs,}) : isDesktop = false;
 
-  const NetworkCallAppBar.desktop({super.key, this.hasBottom = false, required this.filters, required this.onClearLogs}) : isDesktop = true;
+  const NetworkCallAppBar.desktop({super.key, this.hasBottom = false, required this.filters, required this.onClearLogs,}) : isDesktop = true;
 
   final bool hasBottom;
   final bool isDesktop;
@@ -403,7 +403,7 @@ class _FilterTile extends StatelessWidget {
 
     if (isActive) {
       textColor = Theme.of(context).colorScheme.surface;
-      backgroundColor = Theme.of(context).appBarTheme.backgroundColor!;
+      backgroundColor = Theme.of(context).appBarTheme.backgroundColor ?? Theme.of(context).colorScheme.primary;
 
       if (activeTextColor != null) {
         textColor = activeTextColor!;

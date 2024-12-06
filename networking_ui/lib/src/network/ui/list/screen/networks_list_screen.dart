@@ -7,6 +7,7 @@ import '/src/network/ui/list/components/network_call_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../components/network_call_app_bar.dart';
+import 'dart:io';
 
 class NetworksListScreen extends StatefulWidget {
   const NetworksListScreen({super.key, required this.storage});
@@ -38,7 +39,7 @@ class _NetworksListScreenState extends State<NetworksListScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: _networkFilters.selectedMethods.isNotEmpty
-            ? Size.fromHeight(kToolbarHeight + 5)
+            ? Size.fromHeight(kToolbarHeight + 5 + (Platform.isMacOS ? 25 : 0))
             : Size.fromHeight(kToolbarHeight),
         child: ListenableBuilder(
           listenable: _networkFilters,
