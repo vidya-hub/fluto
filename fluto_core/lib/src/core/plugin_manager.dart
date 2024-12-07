@@ -3,6 +3,7 @@ import 'package:fluto_core/fluto.dart';
 import 'package:fluto_core/src/fluto_app_runner.dart';
 import 'package:fluto_core/src/logger/log_viewer.dart';
 import 'package:networking_ui/networking_ui.dart';
+import 'package:unity_message_ui/unity_message_ui.dart';
 
 abstract class FlutoPluginRegistrar {
   static Map<String, Pluggable> defaultPlugins = {
@@ -17,6 +18,13 @@ abstract class FlutoPluginRegistrar {
         storage: FlutoAppRunner().networkStorage,
       ),
       name: "Network",
+    ),
+    "UnityMessage": ScreenLauncherPlugin(
+      devIdentifier: 'three',
+      screen: UnityMessageListScreen(
+        storage: FlutoAppRunner().unityMessageStorage,
+      ),
+      name: "UnityMessage",
     ),
   };
   static final Map<String, Pluggable> _plugins = {};
