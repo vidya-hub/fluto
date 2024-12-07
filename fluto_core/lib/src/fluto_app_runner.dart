@@ -9,6 +9,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:networking_ui/networking_ui.dart';
 import 'package:provider/provider.dart';
+import 'package:unity_message_ui/unity_message_ui.dart';
 
 
 import 'fluto_network_storage.dart';
@@ -18,6 +19,7 @@ class FlutoAppRunner {
   static final FlutoAppRunner _instance = FlutoAppRunner._internal();
   late FlutoLoggerProvider _loggerProvider;
   late NetworkStorage _networkStorage;
+  late UnityMessageStorage unityMessageStorage;
   late SupabaseProvider _supabaseProvider;
 
   factory FlutoAppRunner() {
@@ -27,6 +29,13 @@ class FlutoAppRunner {
   FlutoAppRunner._internal() {
     _loggerProvider = FlutoLoggerProvider();
     _supabaseProvider = SupabaseProvider();
+  }
+
+  Future<void> _initialize()async{
+    final LazyBox box = await Hive.openLazyBox('UnityProvider');
+    unityMessageStorage = FlutoUnityMessageStorage(box:box);
+    await unityMessageStorage.init();
+    UnityMessageInterceptor.init(unityMessageStorage);
   }
 
   Future<void> runFlutoRunner({
@@ -63,6 +72,8 @@ class FlutoAppRunner {
           _networkStorage = FlutoNetworkStorage(box: box, supabase: _supabaseProvider.supabase);
           await _networkStorage.init();
           NetworkCallInterceptor.init(_networkStorage);
+
+          await _initialize();
 
           runApp(
             MultiProvider(
