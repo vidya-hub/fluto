@@ -27,6 +27,8 @@ dependencies:
   flutter_dotenv: ^5.2.1
   networking_ui:
     path: ../networking_ui
+  unity_message_ui:
+    path: ../unity_message_ui
 
 dev_dependencies:
   flutter_test:

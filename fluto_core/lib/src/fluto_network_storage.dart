@@ -1,3 +1,4 @@
+import 'package:fluto_core/fluto.dart';
 import 'package:hive/hive.dart';
 import 'package:networking_ui/networking_ui.dart';
 
@@ -27,9 +28,56 @@ class FlutoNetworkLazyBox extends LazyNetworkBox {
   }
 }
 
+class FlutoUnityStorageLazyBox extends LazyUnityBox {
+  final LazyBox _box;
+
+  FlutoUnityStorageLazyBox(this._box);
+
+  @override
+  Future<void> clear() {
+    return _box.clear();
+  }
+
+  @override
+  Future get(key) {
+    return _box.get(key);
+  }
+
+  @override
+  Iterable get keys => _box.keys;
+
+  @override
+  Future<void> put(key, value) {
+    return _box.put(key, value);
+  }
+}
+
+class FlutoUnityMessageStorage extends UnityMessageStorage {
+  final Supabase? supabase;
+  FlutoUnityMessageStorage({
+    required LazyBox box,
+    this.supabase,
+  }) : super(FlutoUnityStorageLazyBox(box));
+
+  @override
+  Future<void> addNetworkCall(UnityMessageModel call) async {
+    if (supabase != null) {
+      try {
+        await supabase!.client.from('fluto_network').insert({
+          "network_data": call.toJson(),
+        });
+      } catch (e) {
+        print("Error adding network call to supabase\n$e");
+      }
+    }
+    return super.addNetworkCall(call);
+  }
+}
+
 class FlutoNetworkStorage extends NetworkStorage {
   final Supabase? supabase;
-  FlutoNetworkStorage({required LazyBox box, this.supabase}) : super(FlutoNetworkLazyBox(box));
+  FlutoNetworkStorage({required LazyBox box, this.supabase})
+      : super(FlutoNetworkLazyBox(box));
 
   @override
   Future<void> addNetworkCall(InfospectNetworkCall call) async {
