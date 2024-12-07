@@ -14,12 +14,15 @@ class ChangeFlavourScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Change Flavour"),
+        ),
         body: Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 20),
-              const Text("Change ENV",
+              const Text("Change ENV/FLAVOUR",
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
               ...config.flavours.entries.map((element) {
                 return FutureBuilder<String?>(
